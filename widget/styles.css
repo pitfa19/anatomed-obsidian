@@ -1,0 +1,345 @@
+:root {
+  --bg: #ffffff;
+  --stage-bg: #f4f4f6;
+  --fg: #1a1a1a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --surface: #ffffff;
+  --surface-2: #efeff1;
+  --panel: rgba(255, 255, 255, 0.86);
+  --accent: #2563eb;
+}
+.am-root.am-dark {
+  --bg: #1b1b1f;
+  --stage-bg: #15151a;
+  --fg: #e8e8ea;
+  --muted: #9aa0a6;
+  --border: #34343a;
+  --surface: #232329;
+  --surface-2: #2b2b32;
+  --panel: rgba(28, 28, 33, 0.86);
+  --accent: #6ea8fe;
+}
+
+* { box-sizing: border-box; }
+/* overscroll-behavior:none stops a gesture inside the widget from chaining out
+   to scroll the surrounding Claude chat (esp. iOS). */
+html, body, #root { margin: 0; height: 100%; width: 100%; overscroll-behavior: none; }
+body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+.am-root {
+  display: flex;
+  flex-direction: column;
+  height: clamp(440px, 72vh, 680px);
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+
+.am-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+.am-title { font-weight: 650; font-size: 0.9rem; }
+.am-sub { font-size: 0.72rem; color: var(--muted); }
+
+/* Viewport: positioning context for the floating legend. The legend must live
+   OUTSIDE .am-stage — R3F sets touch-action:none on the full-bleed canvas
+   wrapper, and Chromium then blocks touch-scrolling for the whole stage subtree.
+   As a sibling of the stage (inside this viewport) the legend scrolls. */
+.am-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+/* Stage: canvas fills it; legend floats on top. */
+.am-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 120% at 50% 30%, color-mix(in srgb, var(--stage-bg) 60%, transparent), var(--stage-bg));
+}
+.am-canvas { position: absolute; inset: 0; touch-action: none; overscroll-behavior: none; }
+/* touch-action:none so 3D drag/pinch gestures are captured here (rotate/zoom/pan)
+   instead of scrolling the surrounding chat. NOTE: iOS/WKWebView ignores this
+   inside a sandboxed iframe — the real stopper is the non-passive touchmove
+   preventDefault in <CanvasGestureLock>. The legend list re-enables pan-y. */
+.am-canvas canvas { display: block; width: 100% !important; height: 100% !important; touch-action: none; }
+
+.am-loading {
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--panel);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  pointer-events: none;
+  z-index: 3;
+}
+.am-center {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.4rem; height: 100%; color: var(--muted); font-size: 0.85rem;
+}
+.am-error { color: #b91c1c; }
+.am-dark .am-error { color: #fca5a5; }
+.am-error-detail { font-size: 0.7rem; color: var(--muted); max-width: 80%; text-align: center; word-break: break-word; }
+
+/* Floating, collapsible legend */
+.am-legend {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 4;
+  /* NOTE: do NOT add `transform`/`translateZ` here. On iOS a transform +
+     overflow:hidden ancestor stops the nested list (.am-legend-body) from
+     receiving touch-scroll — the box is scrollable but a finger can't drive it.
+     (The legend already lives outside .am-stage, so it doesn't need a promoted
+     layer to escape the canvas's non-fast-scrollable region.) */
+  width: clamp(168px, 42%, 240px);
+  max-height: calc(100% - 1rem);
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+/* Panel background + blur live on a pseudo layer BEHIND the content, not on an
+   ancestor of the scroll list. iOS Safari/WKWebView breaks touch-scrolling of any
+   descendant of a `backdrop-filter` element — keeping the filter off the legend
+   itself is what lets the list scroll on iPhone (it scrolled in Chromium either way). */
+.am-legend::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.am-legend.am-collapsed { width: max-content; }
+/* When collapsed, the (hidden) body's nowrap content would otherwise stretch the
+   legend to full width; zero its width so the pill sizes to just its header. */
+.am-legend.am-collapsed .am-legend-collapse { width: 0; }
+
+/* Collapse/expand: animate the body's height (grid-rows 1fr<->0fr) + fade. */
+.am-legend-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  /* Fill the legend's height so the grid track is definite and the body below
+     gets a real (bounded, scrollable) height on iOS — without this the list can
+     overflow and get clipped instead of scrolling. */
+  flex: 1 1 auto;
+  min-height: 0;
+  opacity: 1;
+  transition: grid-template-rows 0.24s ease, opacity 0.2s ease;
+}
+.am-legend.am-collapsed .am-legend-collapse {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.am-legend-collapse-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.am-legend-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  font: inherit;
+  touch-action: manipulation; /* no double-tap zoom; keeps triple-tap reliable */
+}
+.am-legend-title { font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.03em; }
+.am-muted { color: var(--muted); font-weight: 400; font-size: 0.72rem; }
+.am-chev { transition: transform 0.15s ease; flex: 0 0 auto; }
+.am-chev-open { transform: rotate(90deg); }
+
+.am-legend-actions {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0 0.5rem 0.4rem;
+}
+.am-btn {
+  font-size: 0.68rem;
+  padding: 0.12rem 0.45rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.am-btn:hover { background: var(--surface-2); }
+
+.am-legend-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
+  overscroll-behavior: contain;      /* don't chain to the chat at the ends */
+  touch-action: pan-y;
+  padding: 0 0.3rem 0.4rem;
+}
+/* Attribution footer (CC BY-SA 4.0 credit for the Z-Anatomy models). Kept out of
+   the scroll body so it stays visible; its height is subtracted in the legend's
+   fit() so the body remains a definite, scrollable box on iOS. */
+.am-legend-credit {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.55rem 0.4rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.58rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+.am-legend-credit a { color: var(--muted); text-decoration: underline; }
+.am-legend-credit a:hover { color: var(--accent); }
+
+.am-sys-head {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--muted); padding: 0.3rem 0.35rem 0.12rem;
+}
+.am-row { display: flex; align-items: center; gap: 0.3rem; padding: 0.08rem 0.3rem; border-radius: 6px; }
+.am-row:hover { background: var(--surface-2); }
+.am-row.am-off { opacity: 0.42; }
+.am-row.am-ctx .am-name-en { color: var(--muted); }
+.am-eye {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  border: 0; background: transparent; color: var(--fg); cursor: pointer; padding: 0.1rem 0.1rem;
+}
+.am-swatch { width: 10px; height: 10px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.25); display: inline-block; flex: 0 0 auto; }
+.am-name {
+  display: flex; align-items: center; gap: 0.35rem;
+  border: 0; background: transparent; color: var(--fg); cursor: pointer; text-align: left;
+  padding: 0.1rem 0.1rem; flex: 1 1 auto; min-width: 0;
+}
+.am-name:hover .am-name-en { color: var(--accent); text-decoration: underline; }
+.am-name-en { font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.am-ctx-tag {
+  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 0.2rem; flex: 0 0 auto;
+}
+
+/* Recenter / re-fit button (undoes a pan or zoom). */
+.am-recenter {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--fg);
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+.am-recenter:hover { background: var(--surface-2); }
+
+/* Follow-cursor label for the hovered structure. */
+.am-tooltip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  transform: translate(14px, 8px);
+  max-width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--panel);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.12rem 0.45rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+.am-unmatched {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 3;
+  max-width: 55%;
+  font-size: 0.68rem;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Mobile: legend stays a COMPACT top-right panel (not a bottom sheet).
+   Collapsed = small pill, model fully visible; expanded = a bounded, scrollable
+   list anchored top-right so the model stays visible behind it. */
+@media (max-width: 560px) {
+  .am-root { height: clamp(420px, 78vh, 620px); }
+  .am-legend {
+    top: max(0.5rem, env(safe-area-inset-top));
+    right: max(0.5rem, env(safe-area-inset-right));
+    left: auto;
+    bottom: auto;
+    width: min(72vw, 264px);
+    max-width: calc(100% - 1rem);
+    /* Bounded so a long list scrolls inside instead of covering the model;
+       collapsed it's just a pill, so the model is fully visible by default. */
+    max-height: min(80%, calc(100% - 1rem));
+  }
+
+  /* Finger-sized tap targets (~44px rows, bigger buttons). */
+  .am-legend-head { padding: 0.6rem 0.75rem; }
+  .am-legend-actions { padding: 0 0.6rem 0.5rem; gap: 0.5rem; }
+  .am-btn { padding: 0.4rem 0.85rem; font-size: 0.8rem; }
+  .am-row { padding: 0.4rem 0.4rem; gap: 0.5rem; }
+  .am-eye { padding: 0.35rem 0.3rem; }
+  .am-name { padding: 0.35rem 0.1rem; }
+  .am-name-en { font-size: 0.85rem; }
+  .am-swatch { width: 12px; height: 12px; }
+
+  /* Bigger, safe-area-aware recenter button (top-left, opposite the legend). */
+  .am-recenter {
+    width: 40px;
+    height: 40px;
+    top: max(0.5rem, env(safe-area-inset-top));
+    left: max(0.5rem, env(safe-area-inset-left));
+  }
+
+  /* Unmatched note moves to bottom-left, clear of the top-row controls. */
+  .am-unmatched {
+    top: auto;
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
+    left: max(0.5rem, env(safe-area-inset-left));
+    max-width: 60%;
+  }
+}

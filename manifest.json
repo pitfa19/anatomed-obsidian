@@ -1,0 +1,10 @@
+{
+  "id": "anatomed",
+  "name": "Anatomed 3D Anatomy",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Embed interactive, region-isolated 3D anatomy in your notes. Write a region in an anatomed code block to get a rotatable, validated 3D model with a toggleable legend.",
+  "author": "Fabijan Pitlović",
+  "authorUrl": "https://anatomed-mcp.vercel.app",
+  "isDesktopOnly": true
+}

@@ -1,0 +1,18 @@
+node_modules/
+.DS_Store
+
+# Obsidian writes plugin settings here when this folder is used as a live plugin
+# (e.g. symlinked into a vault for development).
+data.json
+
+# Build outputs (attached to GitHub releases; not committed).
+# Anchored to the repo root so they don't also ignore the widget/styles.css SOURCE
+# that esbuild reads to generate the root styles.css.
+/main.js
+/main.js.map
+/styles.css
+
+# Demo video sources — the mp4 is attached to the GitHub release; not committed.
+# (Only the poster PNG in docs/ is committed.)
+obsidian-demo.mp4
+anatomed-obsidian-plugin-demo.webm
