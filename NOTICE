@@ -1,0 +1,34 @@
+Anatomed — 3D Anatomy for Obsidian
+Copyright (c) 2026 Fabijan Pitlović
+
+This project is distributed under two licenses:
+
+  • Software (source code, build scripts, config)        — MIT (see LICENSE)
+  • Anatomy models + derived data (GLBs, catalog JSONs)  — CC BY-SA 4.0
+                                                            (see LICENSE-ASSETS)
+
+--------------------------------------------------------------------------------
+Third-party content and attribution
+--------------------------------------------------------------------------------
+
+3D ANATOMY MODELS
+The 3D anatomy content is derived from Z-Anatomy, the libre 3D atlas of anatomy,
+by Gauthier Kervyn and Marcin Zielinski — licensed CC BY-SA 4.0.
+  https://www.z-anatomy.com/   |   https://github.com/Z-Anatomy
+
+Z-Anatomy is itself derived from BodyParts3D, © The Database Center for Life
+Science (DBCLS) — licensed CC BY-SA 2.1 Japan.
+  https://dbarchive.biosciencedbc.jp/en/bodyparts3d/
+
+Attribution chain:
+  BodyParts3D (DBCLS, CC BY-SA 2.1 JP)
+    → Z-Anatomy (Kervyn & Zielinski, CC BY-SA 4.0)
+      → Anatomed
+
+The models were modified for this project (region subsets extracted, re-exported
+to GLB, meshopt-compressed; catalog + neighbour data generated). See LICENSE-ASSETS.
+
+SOFTWARE DEPENDENCIES
+Built on open-source libraries including three.js, React, react-dom, and
+@react-three/fiber / @react-three/drei, bundled with esbuild against the Obsidian
+plugin API — each under its own license (MIT / Apache-2.0 / BSD family).

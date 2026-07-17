@@ -1,0 +1,287 @@
+import {
+  Plugin,
+  PluginSettingTab,
+  Setting,
+  MarkdownRenderChild,
+  normalizePath,
+  requestUrl,
+  TFile,
+  Notice,
+  type App,
+  type MarkdownPostProcessorContext,
+} from 'obsidian';
+import { StrictMode } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { buildRegion } from './src/region';
+import { primeNeighbors } from './src/neighbors';
+import type { RegionDetail, RegionPart, RegionPayload } from './src/shared';
+import type { PartsCatalog } from './src/vendor/types';
+import RegionViewer from './widget/RegionViewer';
+import catalogRaw from './assets/parts-catalog.json';
+
+// Bundled, validated catalogue (Z-Anatomy-derived). Drop the ".g" group
+// containers exactly like the server's loadCatalog does.
+const CATALOG: PartsCatalog = (() => {
+  const raw = catalogRaw as unknown as PartsCatalog;
+  return { ...raw, parts: raw.parts.filter((p) => !p.id.endsWith('.g')) };
+})();
+
+const SUPABASE_ASSETS =
+  'https://uafyfwyyqzunabpuftue.supabase.co/storage/v1/object/public/models';
+
+const DETAILS: RegionDetail[] = ['isolated', 'related', 'regional'];
+
+interface AnatomedSettings {
+  assetBase: string;
+  notesFolder: string;
+  height: number;
+  defaultDetail: RegionDetail;
+}
+const DEFAULT_SETTINGS: AnatomedSettings = {
+  assetBase: SUPABASE_ASSETS,
+  notesFolder: '',
+  height: 480,
+  defaultDetail: 'isolated',
+};
+
+interface BlockConfig {
+  queries: string[];
+  detail: RegionDetail;
+  title?: string;
+}
+
+/** Parse a fenced ```anatomed block. `region:`/`parts:` lines (comma-separated)
+ *  become queries; a bare line is also a query; `detail:` and `title:` tune the
+ *  view. Lines starting with # or // are comments. */
+function parseBlock(source: string, defaultDetail: RegionDetail): BlockConfig {
+  const queries: string[] = [];
+  let detail = defaultDetail;
+  let title: string | undefined;
+  for (const line of source.split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#') || t.startsWith('//')) continue;
+    const i = t.indexOf(':');
+    if (i === -1) {
+      queries.push(t);
+      continue;
+    }
+    const key = t.slice(0, i).trim().toLowerCase();
+    const val = t.slice(i + 1).trim();
+    if (key === 'region' || key === 'regions' || key === 'part' || key === 'parts') {
+      for (const q of val.split(',').map((s) => s.trim()).filter(Boolean)) queries.push(q);
+    } else if (key === 'detail') {
+      if ((DETAILS as string[]).includes(val)) detail = val as RegionDetail;
+    } else if (key === 'title') {
+      title = val;
+    } else {
+      queries.push(t);
+    }
+  }
+  return { queries, detail, title };
+}
+
+function AnatomedEmbed({
+  payload,
+  onSelect,
+}: {
+  payload: RegionPayload;
+  onSelect: (p: RegionPart) => void;
+}) {
+  const unmatched = payload.unmatched.length ? ` · ${payload.unmatched.length} unmatched` : '';
+  const n = payload.parts.length;
+  return (
+    <>
+      <div className="am-header">
+        <span className="am-title">{payload.title}</span>
+        <span className="am-sub">
+          {n} structure{n === 1 ? '' : 's'}
+          {unmatched}
+        </span>
+      </div>
+      <RegionViewer payload={payload} onSelect={onSelect} />
+    </>
+  );
+}
+
+export default class AnatomedPlugin extends Plugin {
+  settings: AnatomedSettings = DEFAULT_SETTINGS;
+  private neighborsReady: Promise<void> | null = null;
+
+  async onload() {
+    await this.loadSettings();
+    this.addSettingTab(new AnatomedSettingTab(this.app, this));
+    this.registerMarkdownCodeBlockProcessor('anatomed', (source, el, ctx) =>
+      this.render(source, el, ctx),
+    );
+  }
+
+  /** Lazily fetch + prime the neighbours dataset (only needed for related/regional).
+   *  Streamed from the asset host (same origin as the GLBs) rather than bundled, so
+   *  the shipped plugin stays small and has no filesystem dependency. `requestUrl`
+   *  is Obsidian's fetch that isn't subject to CORS. */
+  private ensureNeighbors(): Promise<void> {
+    if (!this.neighborsReady) {
+      this.neighborsReady = (async () => {
+        const url = `${this.settings.assetBase}/parts-neighbors.json`;
+        const res = await requestUrl({ url });
+        primeNeighbors(res.json);
+      })().catch((e) => {
+        this.neighborsReady = null; // allow a later retry
+        throw e;
+      });
+    }
+    return this.neighborsReady;
+  }
+
+  private async render(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
+    const cfg = parseBlock(source, this.settings.defaultDetail);
+    if (!cfg.queries.length) {
+      el.createDiv({
+        cls: 'am-embed-msg',
+        text: 'anatomed: add a `region:` or `parts:` line, e.g. `region: cervical spine`.',
+      });
+      return;
+    }
+
+    if (cfg.detail !== 'isolated') {
+      try {
+        await this.ensureNeighbors();
+      } catch (e) {
+        console.warn('[anatomed] neighbours unavailable, falling back to isolated', e);
+        new Notice('Anatomed: context data unavailable, showing isolated view.');
+        cfg.detail = 'isolated';
+      }
+    }
+
+    const { payload } = buildRegion(CATALOG, cfg.queries, this.settings.assetBase, {
+      detail: cfg.detail,
+      title: cfg.title,
+    });
+
+    const root = el.createDiv({ cls: 'am-root' });
+    if (document.body.classList.contains('theme-dark')) root.addClass('am-dark');
+    root.style.height = `${this.settings.height}px`;
+
+    const reactRoot = createRoot(root);
+    reactRoot.render(
+      <StrictMode>
+        <AnatomedEmbed payload={payload} onSelect={(p) => void this.openOrCreateNote(p)} />
+      </StrictMode>,
+    );
+    // Unmount (disposing the WebGL context) when the block leaves the DOM.
+    ctx.addChild(new ReactChild(root, reactRoot));
+  }
+
+  /** Click a structure -> open (or create) its note, wiring the viewer into the
+   *  student's knowledge map. */
+  private async openOrCreateNote(part: RegionPart) {
+    const safe = part.name_en.replace(/[\\/:*?"<>|#^[\]]/g, '').trim();
+    if (!safe) return;
+    const folder = this.settings.notesFolder.trim().replace(/^\/+|\/+$/g, '');
+    const path = normalizePath(folder ? `${folder}/${safe}.md` : `${safe}.md`);
+
+    let file = this.app.vault.getAbstractFileByPath(path);
+    if (!(file instanceof TFile)) {
+      if (folder && !this.app.vault.getAbstractFileByPath(folder)) {
+        try {
+          await this.app.vault.createFolder(folder);
+        } catch {
+          /* already exists */
+        }
+      }
+      const lat =
+        part.name_lat && part.name_lat !== part.name_en ? ` (*${part.name_lat}*)` : '';
+      try {
+        file = await this.app.vault.create(path, `# ${part.name_en}${lat}\n\n`);
+      } catch {
+        file = this.app.vault.getAbstractFileByPath(path); // lost a create race
+      }
+    }
+    if (file instanceof TFile) await this.app.workspace.getLeaf(true).openFile(file);
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+}
+
+class ReactChild extends MarkdownRenderChild {
+  constructor(
+    el: HTMLElement,
+    private root: Root,
+  ) {
+    super(el);
+  }
+  onunload() {
+    this.root.unmount();
+  }
+}
+
+class AnatomedSettingTab extends PluginSettingTab {
+  constructor(
+    app: App,
+    private plugin: AnatomedPlugin,
+  ) {
+    super(app, plugin);
+  }
+
+  display() {
+    const { containerEl } = this;
+    containerEl.empty();
+
+    new Setting(containerEl)
+      .setName('Asset base URL')
+      .setDesc('Base URL the 3D models (GLB files) are fetched from.')
+      .addText((t) =>
+        t
+          .setPlaceholder(SUPABASE_ASSETS)
+          .setValue(this.plugin.settings.assetBase)
+          .onChange(async (v) => {
+            this.plugin.settings.assetBase = (v.trim() || SUPABASE_ASSETS).replace(/\/+$/, '');
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Structure notes folder')
+      .setDesc('Folder for notes created when you click a structure (blank = vault root).')
+      .addText((t) =>
+        t
+          .setPlaceholder('Anatomy')
+          .setValue(this.plugin.settings.notesFolder)
+          .onChange(async (v) => {
+            this.plugin.settings.notesFolder = v;
+            await this.plugin.saveSettings();
+          }),
+      );
+
+    new Setting(containerEl)
+      .setName('Viewer height (px)')
+      .setDesc('Height of each embedded viewer (200–1200).')
+      .addText((t) =>
+        t.setValue(String(this.plugin.settings.height)).onChange(async (v) => {
+          const n = parseInt(v, 10);
+          if (!Number.isNaN(n) && n >= 200 && n <= 1200) {
+            this.plugin.settings.height = n;
+            await this.plugin.saveSettings();
+          }
+        }),
+      );
+
+    new Setting(containerEl)
+      .setName('Default detail')
+      .setDesc('Context level used when a block omits `detail:`.')
+      .addDropdown((d) =>
+        d
+          .addOptions({ isolated: 'isolated', related: 'related', regional: 'regional' })
+          .setValue(this.plugin.settings.defaultDetail)
+          .onChange(async (v) => {
+            this.plugin.settings.defaultDetail = v as RegionDetail;
+            await this.plugin.saveSettings();
+          }),
+      );
+  }
+}

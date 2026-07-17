@@ -1,0 +1,52 @@
+# License for the anatomy assets and derived data
+
+The 3D anatomy **models** and the **anatomical data derived from them** that ship
+with or are served by this project are **NOT** covered by the repository's MIT
+`LICENSE` (which applies to the software only). They are licensed under:
+
+**Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)**
+<https://creativecommons.org/licenses/by-sa/4.0/>
+Full legal code: <https://creativecommons.org/licenses/by-sa/4.0/legalcode>
+
+## What this covers
+
+- The GLB model files served by the widget (`assets/glb/*.glb`, hosted on Supabase).
+- `assets/parts-catalog.json` — the catalogue of named structures derived from the
+  Z-Anatomy model (node names, Latin/English nomenclature, systems, laterality).
+- `assets/parts-neighbors.json` — nearest-neighbour relationships computed from the
+  geometry of those models.
+
+## Attribution (required by CC BY-SA 4.0)
+
+This content is derived from **Z-Anatomy** — *The libre 3D atlas of anatomy* — by
+Gauthier Kervyn and Marcin Zielinski, licensed **CC BY-SA 4.0**.
+<https://www.z-anatomy.com/> · <https://github.com/Z-Anatomy>
+
+Z-Anatomy is itself derived from **BodyParts3D** — © The Database Center for Life
+Science (DBCLS), licensed **CC BY-SA 2.1 Japan**.
+<https://dbarchive.biosciencedbc.jp/en/bodyparts3d/> ·
+<https://creativecommons.org/licenses/by-sa/2.1/jp/>
+
+Attribution chain:
+
+    BodyParts3D (DBCLS, CC BY-SA 2.1 Japan)
+      → Z-Anatomy (Kervyn & Zielinski, CC BY-SA 4.0)
+        → Anatomed (this project)
+
+## Changes made (indicated per CC BY-SA 4.0 §3(a)(1)(B))
+
+The Z-Anatomy source was modified for this project. Notably:
+
+- Only subsets of structures are extracted and shown ("region isolation"); no whole
+  body system is rendered.
+- The models were re-exported to glTF/GLB and **meshopt-compressed** for streaming.
+- Vessels and nerves were re-exported directly from the Z-Anatomy `Startup.blend` to
+  preserve their thin curve geometry.
+- A validated catalogue and nearest-neighbour dataset were generated from the models.
+
+## ShareAlike obligation
+
+Because this content is CC BY-SA 4.0, any redistributed copy or adaptation of these
+models or the derived data **must** (1) keep this attribution, (2) indicate changes,
+and (3) be distributed under CC BY-SA 4.0 (or a compatible license). It may **not** be
+relicensed under the MIT terms that cover the software.

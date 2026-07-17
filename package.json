@@ -1,0 +1,29 @@
+{
+  "name": "anatomed-obsidian",
+  "version": "0.1.0",
+  "description": "Interactive, region-isolated 3D anatomy rendered inline in Obsidian notes.",
+  "author": "Fabijan Pitlović",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs --prod",
+    "dev": "node esbuild.config.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@react-three/drei": "^10.4.0",
+    "@react-three/fiber": "^9.1.2",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.169.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.23.0",
+    "obsidian": "^1.6.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.169.0",
+    "typescript": "^5.7.0"
+  }
+}
