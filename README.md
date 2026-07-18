@@ -1,7 +1,7 @@
-# Anatomed — 3D Anatomy for Obsidian
+# Anatomed: 3D Anatomy for Obsidian
 
 Embed interactive, **region-isolated 3D anatomy** directly in your notes. Write an `anatomed`
-code block and get a live, rotatable 3D model inline — showing only the structures you asked
+code block and get a live, rotatable 3D model inline, showing only the structures you asked
 for, with a legend to toggle each one. Click a structure to open (or create) its note, wiring
 anatomy into your knowledge map.
 
@@ -38,23 +38,23 @@ title: Cervical spine
 ```
 ````
 
-- `region:` / `parts:` — one or more structures (comma-separated), in English, Latin, or Croatian.
-- `detail:` — `isolated` (default), `related`, or `regional` (surrounding structures shown translucent).
-- `title:` — optional heading.
+- `region:` / `parts:` accept one or more structures (comma-separated), in English, Latin, or Croatian.
+- `detail:` accepts `isolated` (default), `related`, or `regional` (surrounding structures shown translucent).
+- `title:` sets an optional heading.
 
 Drag to rotate, scroll to zoom, right-drag to pan; toggle structures in the legend; hover for
 names. **Click a structure** to open (or create) a `[[Structure]]` note.
 
 ## Settings
 
-- **Asset base URL** — where the 3D models (and the `related`/`regional` context data) are fetched from.
-- **Structure notes folder** — where click-to-create notes are placed.
+- **Asset base URL**: where the 3D models (and the `related`/`regional` context data) are fetched from.
+- **Structure notes folder**: where click-to-create notes are placed.
 - **Viewer height** and **Default detail**.
 
 ## Privacy & network
 
-The 3D model files (GLB) — and, only for `related`/`regional` blocks, a nearest-neighbour dataset
-— stream from a public asset host (configurable above). Nothing else leaves your machine; there is
+The 3D model files (GLB), plus a nearest-neighbour dataset used only for `related`/`regional` blocks,
+stream from a public asset host (configurable above). Nothing else leaves your machine; there is
 no telemetry.
 
 ## Building from source
@@ -75,8 +75,8 @@ Layout: `main.tsx` (plugin entry) · `src/` (region resolver + catalogue) · `wi
 
 ## License & attribution
 
-- **Software** (this plugin's code) — [MIT](LICENSE).
-- **3D anatomy models + derived data** — **CC BY-SA 4.0** (see [`LICENSE-ASSETS`](LICENSE-ASSETS)
+- **Software** (this plugin's code): [MIT](LICENSE).
+- **3D anatomy models + derived data**: **CC BY-SA 4.0** (see [`LICENSE-ASSETS`](LICENSE-ASSETS)
   and [`NOTICE`](NOTICE)). Derived from **[Z-Anatomy](https://www.z-anatomy.com/)** (Kervyn &
   Zielinski, CC BY-SA 4.0), itself derived from **BodyParts3D** (DBCLS, CC BY-SA 2.1 Japan).
   Attribution is required.
