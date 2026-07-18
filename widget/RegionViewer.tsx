@@ -5,7 +5,7 @@ import { OrbitControls, OrthographicCamera, useGLTF } from '@react-three/drei';
 import type { RegionDetail, RegionPart, RegionPayload, RegionSystemMeta } from '../src/shared';
 import type { PartsCatalog } from '../src/vendor/types';
 import { assembleRegion, cleanName, MAX_REGION_PARTS } from '../src/region';
-import { primeNeighbors } from '../src/neighbors';
+import { primeNeighbors, type NeighborMap } from '../src/neighbors';
 import { resolveQueryToParts, groupAliasSuggestions } from '../src/vendor/resolveParts';
 import { fuzzyMatchScored } from '../src/vendor/fuzzy';
 import {
@@ -36,8 +36,14 @@ interface Props {
    *  `${assetBase}/parts-catalog.json` itself. Enables the in-widget controls. */
   catalog?: PartsCatalog;
   /** Injected neighbour-prime (Obsidian uses requestUrl); when omitted the widget
-   *  fetches `${assetBase}/parts-neighbors.json` and primes it. Must be idempotent. */
+   *  loads `${assetBase}/parts-neighbors.json` via {@link fetchJson} and primes it.
+   *  Must be idempotent. */
   ensureNeighbors?: () => Promise<void>;
+  /** Host-provided JSON loader for the self-fetch fallbacks (catalog + neighbours).
+   *  The browser host (MCP) passes a `fetch`-based one; Obsidian injects `catalog` +
+   *  `ensureNeighbors` (via requestUrl) so this stays unused there. When absent and the
+   *  data isn't injected, the controls degrade (marked unavailable) rather than throw. */
+  fetchJson?: (url: string) => Promise<unknown>;
 }
 
 // Static control mappings, hoisted so they keep a stable identity across
@@ -89,7 +95,7 @@ function buildCandidates(catalog: PartsCatalog): { terms: string[]; byTerm: Map<
 
 const focusOf = (payload: RegionPayload): RegionPart[] => payload.parts.filter((p) => !p.context);
 
-export default function RegionViewer({ payload, onSelect, selectHint = 'Ask about this structure', onChange, catalog: catalogProp, ensureNeighbors: ensureNeighborsProp }: Props) {
+export default function RegionViewer({ payload, onSelect, selectHint = 'Ask about this structure', onChange, catalog: catalogProp, ensureNeighbors: ensureNeighborsProp, fetchJson }: Props) {
   const baseUrl = useMemo(() => payload.assetBase.replace(/\/+$/, ''), [payload.assetBase]);
 
   // --- Editable view state (seeded from the payload, reset on host push) ---
@@ -126,14 +132,15 @@ export default function RegionViewer({ payload, onSelect, selectHint = 'Ask abou
   // Fetch the catalog once (unless injected) so the controls can recompute regions.
   useEffect(() => {
     if (catalogProp) return;
+    if (!fetchJson) {
+      setCatalogFailed(true);
+      return;
+    }
     let cancelled = false;
-    fetch(`${baseUrl}/parts-catalog.json`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`${r.status}`);
-        return r.json();
-      })
-      .then((data: PartsCatalog) => {
+    fetchJson(`${baseUrl}/parts-catalog.json`)
+      .then((raw) => {
         if (cancelled) return;
+        const data = raw as PartsCatalog;
         data.parts = data.parts.filter((p) => !p.id.endsWith('.g')); // drop group containers
         setFetchedCatalog(data);
       })
@@ -143,7 +150,7 @@ export default function RegionViewer({ payload, onSelect, selectHint = 'Ask abou
     return () => {
       cancelled = true;
     };
-  }, [catalogProp, baseUrl]);
+  }, [catalogProp, baseUrl, fetchJson]);
 
   // Ensure the neighbour map is primed (once) — injected or self-fetched. A single
   // shared promise dedupes concurrent detail switches (last-write-wins downstream).
@@ -151,13 +158,10 @@ export default function RegionViewer({ payload, onSelect, selectHint = 'Ask abou
   const ensureNeighbors = useCallback((): Promise<void> => {
     if (ensureNeighborsProp) return ensureNeighborsProp();
     if (neighborsPromiseRef.current) return neighborsPromiseRef.current;
-    const pr = fetch(`${baseUrl}/parts-neighbors.json`)
-      .then((r) => {
-        if (!r.ok) throw new Error(`${r.status}`);
-        return r.json();
-      })
+    if (!fetchJson) return Promise.reject(new Error('no neighbour loader'));
+    const pr = fetchJson(`${baseUrl}/parts-neighbors.json`)
       .then((map) => {
-        primeNeighbors(map);
+        primeNeighbors(map as NeighborMap);
       })
       .catch((err) => {
         neighborsPromiseRef.current = null; // allow retry
@@ -165,7 +169,7 @@ export default function RegionViewer({ payload, onSelect, selectHint = 'Ask abou
       });
     neighborsPromiseRef.current = pr;
     return pr;
-  }, [ensureNeighborsProp, baseUrl]);
+  }, [ensureNeighborsProp, baseUrl, fetchJson]);
 
   // The payload actually rendered: recomputed client-side once the catalog is
   // available (and neighbours are primed for related/regional); otherwise the
@@ -705,16 +709,16 @@ function Legend({
   const [narrowed, setNarrowed] = useState(
     () => typeof window !== 'undefined' && window.innerWidth < 560,
   );
-  const foldTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => () => clearTimeout(foldTimer.current), []);
+  const foldTimer = useRef<number | undefined>(undefined); // window.setTimeout id (DOM: number)
+  useEffect(() => () => window.clearTimeout(foldTimer.current), []);
   const toggleFold = useCallback(() => {
-    clearTimeout(foldTimer.current);
+    window.clearTimeout(foldTimer.current);
     if (!collapsed) {
-      setCollapsed(true);                                            // close height now
-      foldTimer.current = setTimeout(() => setNarrowed(true), 280);  // then width
+      setCollapsed(true);                                                    // close height now
+      foldTimer.current = window.setTimeout(() => setNarrowed(true), 280);   // then width
     } else {
-      setNarrowed(false);                                            // open width now
-      foldTimer.current = setTimeout(() => setCollapsed(false), 280); // then height
+      setNarrowed(false);                                                    // open width now
+      foldTimer.current = window.setTimeout(() => setCollapsed(false), 280); // then height
     }
   }, [collapsed]);
   const total = groups.reduce((n, g) => n + g.parts.length, 0);

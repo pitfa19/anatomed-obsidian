@@ -1,6 +1,6 @@
 {
   "name": "anatomed-obsidian",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Interactive, region-isolated 3D anatomy rendered inline in Obsidian notes.",
   "author": "Fabijan Pitlović",
   "license": "MIT",

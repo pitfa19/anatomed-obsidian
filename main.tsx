@@ -9,6 +9,7 @@ import {
   Notice,
   type App,
   type MarkdownPostProcessorContext,
+  type SettingDefinitionItem,
 } from 'obsidian';
 import { StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -364,5 +365,65 @@ class AnatomedSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }),
       );
+  }
+
+  /** Declarative mirror of display() so the settings are indexed by Obsidian's
+   *  settings search on 1.13.0+ (display() above still renders them, incl. on
+   *  older versions). setControlValue() persists + normalizes edits the
+   *  framework makes through this definition path. */
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: 'Asset base URL',
+        desc: 'Base URL the 3D models (GLB files) are fetched from.',
+        control: { type: 'text', key: 'assetBase', placeholder: SUPABASE_ASSETS },
+      },
+      {
+        name: 'Structure notes folder',
+        desc: 'Folder for notes created when you click a structure (blank = vault root).',
+        control: { type: 'text', key: 'notesFolder', placeholder: 'Anatomy' },
+      },
+      {
+        name: 'Viewer height (px)',
+        desc: 'Height of each embedded viewer (200–1200).',
+        control: {
+          type: 'number',
+          key: 'height',
+          min: 200,
+          max: 1200,
+          validate: (v) => (v >= 200 && v <= 1200 ? undefined : 'Enter a height between 200 and 1200.'),
+        },
+      },
+      {
+        name: 'Default detail',
+        desc: 'Context level used when a block omits `detail:`.',
+        control: {
+          type: 'dropdown',
+          key: 'defaultDetail',
+          options: { isolated: 'isolated', related: 'related', regional: 'regional' },
+        },
+      },
+    ];
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    const s = this.plugin.settings;
+    switch (key) {
+      case 'assetBase':
+        s.assetBase = (String(value).trim() || SUPABASE_ASSETS).replace(/\/+$/, '');
+        break;
+      case 'notesFolder':
+        s.notesFolder = String(value);
+        break;
+      case 'height':
+        s.height = value as number;
+        break;
+      case 'defaultDetail':
+        s.defaultDetail = value as RegionDetail;
+        break;
+      default:
+        return;
+    }
+    await this.plugin.saveSettings();
   }
 }
