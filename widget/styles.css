@@ -269,17 +269,17 @@ body { font-family: var(--font-interface, sans-serif); }
 .am-add-toggle:hover:not(:disabled) { background: var(--surface-2); }
 .am-add-toggle:disabled { opacity: 0.5; cursor: default; }
 .am-add-field { position: relative; margin-top: 0.25rem; min-width: 0; }
-.am-add-input {
-  /* Containment guards (!important): a host (Obsidian core / theme, e.g. Minimal)
-     styles `input[type=text]` at 0,1,1 — higher than this class (0,1,0) — with
-     `box-sizing:content-box` + `padding` + `min-width`, which widens the field past
-     the legend. Since the add field open sets `.am-adding` (legend overflow:visible),
-     that overflow then SPILLS visibly to the right. Pin the box so no host rule can
-     grow it: border-box + width:100% + min/max-width. No-op in Claude's iframe. */
-  box-sizing: border-box !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  max-width: 100% !important;
+/* Containment via specificity: a host (Obsidian core / theme, e.g. Minimal) styles
+   `input[type=text]` at 0,1,1 — higher than a bare `.am-add-input` (0,1,0) — with
+   `box-sizing:content-box` + `padding` + `min-width`, widening the field past the legend;
+   with the add field open (`.am-adding` → legend overflow:visible) that then SPILLS right.
+   Scoping under `.am-root` (0,2,0) beats the host and keeps the box pinned (border-box +
+   width:100% + min/max-width), no importance flag needed. No-op in Claude's iframe. */
+.am-root .am-add-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   -webkit-appearance: none;
   appearance: none;
   margin: 0;
@@ -291,7 +291,7 @@ body { font-family: var(--font-interface, sans-serif); }
   color: var(--fg);
   border-radius: 6px;
 }
-.am-add-input:focus { outline: none; border-color: var(--accent); }
+.am-root .am-add-input:focus { outline: none; border-color: var(--accent); }
 /* Results as an absolute overlay so their height never perturbs the measured
    legend-body cap; capped + scrollable so a long list stays inside the panel. */
 .am-add-results {
@@ -347,18 +347,19 @@ body { font-family: var(--font-interface, sans-serif); }
   overflow: visible;
 }
 
-.am-remove {
+.am-root .am-remove {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  /* Pin the box (!important): a host `button{min-width}` (Obsidian core/theme) can
+  /* Pin the box via specificity: a host `button{min-width}` (Obsidian core/theme) can
      otherwise grow this fixed control past the legend, and with the add field open
-     (`.am-adding` → legend overflow:visible) it spills visibly right. */
-  box-sizing: border-box !important;
-  width: 20px !important;
-  min-width: 20px !important;
-  max-width: 20px !important;
+     (`.am-adding` → legend overflow:visible) it spills visibly right. Scoping under
+     `.am-root` (0,2,0) beats a bare host `button` rule, no importance flag needed. */
+  box-sizing: border-box;
+  width: 20px;
+  min-width: 20px;
+  max-width: 20px;
   height: 20px;
   /* Explicit reset: a host's default <button> chrome (notably Obsidian's) adds
      padding + box-shadow + background; the padding collapses this fixed 20px box
@@ -519,8 +520,10 @@ body { font-family: var(--font-interface, sans-serif); }
   /* Bigger controls; the remove ✕ is always visible (no hover on touch). */
   .am-seg { padding: 0.4rem 0.1rem; font-size: 0.72rem; }
   .am-add-toggle { padding: 0.4rem 0.5rem; font-size: 0.74rem; }
-  .am-add-input { padding: 0.4rem 0.5rem; font-size: 0.8rem; }
-  .am-remove { opacity: 1; width: 28px !important; min-width: 28px !important; max-width: 28px !important; height: 28px; }
+  /* Scoped under .am-root to match the base rule's specificity (0,2,0) so these
+     mobile overrides still win; the base pins the desktop 20px, these bump to 28px. */
+  .am-root .am-add-input { padding: 0.4rem 0.5rem; font-size: 0.8rem; }
+  .am-root .am-remove { opacity: 1; width: 28px; min-width: 28px; max-width: 28px; height: 28px; }
 
   /* Bigger, safe-area-aware recenter button (top-left, opposite the legend). */
   .am-recenter {
