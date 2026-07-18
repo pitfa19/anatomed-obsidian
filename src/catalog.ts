@@ -1,8 +1,8 @@
 import type { PartsCatalog, SystemId, SystemMeta } from './vendor/types';
 
-// NOTE: browser (Obsidian-plugin) copy of the anatomed-mcp module. It intentionally
-// drops the server's disk-based catalog loader: the plugin bundles parts-catalog.json
-// and injects it directly (see main.tsx), so nothing here ever reads from disk.
+// Pure, browser-safe catalog helpers. The disk-based loader (loadCatalog) lives in the
+// Node-only assets-node.ts (server); browser hosts (the widget, the Obsidian plugin)
+// inject or fetch the catalog and call these helpers. Nothing here reads from disk.
 
 export function getSystem(catalog: PartsCatalog, id: SystemId): SystemMeta | null {
   return catalog.systems.find((s) => s.id === id) ?? null;

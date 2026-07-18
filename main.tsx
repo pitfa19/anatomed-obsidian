@@ -17,6 +17,7 @@ import { primeNeighbors } from './src/neighbors';
 import type { RegionDetail, RegionPart, RegionPayload } from './src/shared';
 import type { PartsCatalog } from './src/vendor/types';
 import RegionViewer from './widget/RegionViewer';
+import { AnatomedSuggest } from './suggest';
 import catalogRaw from './assets/parts-catalog.json';
 
 // Bundled, validated catalogue (Z-Anatomy-derived). Drop the ".g" group
@@ -83,9 +84,15 @@ function parseBlock(source: string, defaultDetail: RegionDetail): BlockConfig {
 function AnatomedEmbed({
   payload,
   onSelect,
+  onChange,
+  catalog,
+  ensureNeighbors,
 }: {
   payload: RegionPayload;
   onSelect: (p: RegionPart) => void;
+  onChange: (spec: { parts: string[]; detail: RegionDetail }) => void;
+  catalog: PartsCatalog;
+  ensureNeighbors: () => Promise<void>;
 }) {
   const unmatched = payload.unmatched.length ? ` · ${payload.unmatched.length} unmatched` : '';
   const n = payload.parts.length;
@@ -98,9 +105,36 @@ function AnatomedEmbed({
           {unmatched}
         </span>
       </div>
-      <RegionViewer payload={payload} onSelect={onSelect} />
+      <RegionViewer
+        payload={payload}
+        onSelect={onSelect}
+        selectHint="Make a note about this structure"
+        onChange={onChange}
+        catalog={catalog}
+        ensureNeighbors={ensureNeighbors}
+      />
     </>
   );
+}
+
+/** Render a normalized ```anatomed``` block for persistence. Round-trips through
+ *  parseBlock (parts + detail [+ title]), so the re-render it triggers yields the
+ *  same spec and can't loop. */
+function renderAnatomedBlock(
+  spec: { parts: string[]; detail: RegionDetail },
+  title?: string,
+): string {
+  const lines = ['```anatomed', `parts: ${spec.parts.join(', ')}`, `detail: ${spec.detail}`];
+  if (title) lines.push(`title: ${title}`);
+  lines.push('```');
+  return lines.join('\n');
+}
+
+/** Replace the inclusive line range [start, end] of `data` with `replacement`. */
+function spliceLines(data: string, start: number, end: number, replacement: string): string {
+  const lines = data.split('\n');
+  lines.splice(start, end - start + 1, ...replacement.split('\n'));
+  return lines.join('\n');
 }
 
 export default class AnatomedPlugin extends Plugin {
@@ -113,6 +147,8 @@ export default class AnatomedPlugin extends Plugin {
     this.registerMarkdownCodeBlockProcessor('anatomed', (source, el, ctx) =>
       this.render(source, el, ctx),
     );
+    // Inline autocomplete for structure names inside an ```anatomed``` block.
+    this.registerEditorSuggest(new AnatomedSuggest(this.app, CATALOG));
   }
 
   /** Lazily fetch + prime the neighbours dataset (only needed for related/regional).
@@ -124,7 +160,8 @@ export default class AnatomedPlugin extends Plugin {
       this.neighborsReady = (async () => {
         const url = `${this.settings.assetBase}/parts-neighbors.json`;
         const res = await requestUrl({ url });
-        primeNeighbors(res.json);
+        // requestUrl().json is typed `any`; type it to primeNeighbors' param.
+        primeNeighbors(res.json as Parameters<typeof primeNeighbors>[0]);
       })().catch((e) => {
         this.neighborsReady = null; // allow a later retry
         throw e;
@@ -162,14 +199,57 @@ export default class AnatomedPlugin extends Plugin {
     if (document.body.classList.contains('theme-dark')) root.addClass('am-dark');
     root.style.height = `${this.settings.height}px`;
 
+    const persist = this.makeBlockPersister(el, ctx, cfg.title);
     const reactRoot = createRoot(root);
     reactRoot.render(
       <StrictMode>
-        <AnatomedEmbed payload={payload} onSelect={(p) => void this.openOrCreateNote(p)} />
+        <AnatomedEmbed
+          payload={payload}
+          onSelect={(p) => void this.openOrCreateNote(p)}
+          onChange={persist}
+          catalog={CATALOG}
+          ensureNeighbors={() => this.ensureNeighbors()}
+        />
       </StrictMode>,
     );
     // Unmount (disposing the WebGL context) when the block leaves the DOM.
     ctx.addChild(new ReactChild(root, reactRoot));
+  }
+
+  /** A debounced persister that rewrites the ```anatomed``` block this viewer came
+   *  from when the user edits it in-widget (add / remove / change detail). Uses the
+   *  section-info line range + an atomic vault.process; the written block round-trips
+   *  through parseBlock, so the re-render it triggers doesn't loop. */
+  private makeBlockPersister(
+    el: HTMLElement,
+    ctx: MarkdownPostProcessorContext,
+    title?: string,
+  ): (spec: { parts: string[]; detail: RegionDetail }) => void {
+    let timer: number | null = null;
+    let latest: { parts: string[]; detail: RegionDetail } | null = null;
+    const flush = async () => {
+      timer = null;
+      const spec = latest;
+      latest = null;
+      if (!spec) return;
+      const info = ctx.getSectionInfo(el);
+      if (!info) return; // block not in the render cache (e.g. already re-rendered)
+      const file = this.app.vault.getAbstractFileByPath(ctx.sourcePath);
+      if (!(file instanceof TFile)) return;
+      const block = renderAnatomedBlock(spec, title);
+      try {
+        await this.app.vault.process(file, (data) =>
+          spliceLines(data, info.lineStart, info.lineEnd, block),
+        );
+      } catch (e) {
+        console.warn('[anatomed] could not persist block edit', e);
+      }
+    };
+    return (spec) => {
+      latest = spec;
+      if (timer !== null) window.clearTimeout(timer);
+      timer = window.setTimeout(() => void flush(), 600);
+    };
   }
 
   /** Click a structure -> open (or create) its note, wiring the viewer into the
@@ -201,7 +281,8 @@ export default class AnatomedPlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = (await this.loadData()) as Partial<AnatomedSettings> | null;
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
   }
   async saveSettings() {
     await this.saveData(this.settings);

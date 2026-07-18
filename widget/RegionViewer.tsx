@@ -2,7 +2,12 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, OrthographicCamera, useGLTF } from '@react-three/drei';
-import type { RegionPart, RegionPayload, RegionSystemMeta } from '../src/shared';
+import type { RegionDetail, RegionPart, RegionPayload, RegionSystemMeta } from '../src/shared';
+import type { PartsCatalog } from '../src/vendor/types';
+import { assembleRegion, cleanName, MAX_REGION_PARTS } from '../src/region';
+import { primeNeighbors } from '../src/neighbors';
+import { resolveQueryToParts, groupAliasSuggestions } from '../src/vendor/resolveParts';
+import { fuzzyMatchScored } from '../src/vendor/fuzzy';
 import {
   applyTint,
   computeVisibleUnionBox,
@@ -11,10 +16,28 @@ import {
   setVisibleParts,
 } from './lib/three-helpers';
 
+/** New structure-list + detail spec, emitted when the user edits the view (add /
+ *  remove / change detail) so a host can persist it (Obsidian rewrites the block;
+ *  Claude/MCP leaves onChange undefined = view-only). */
+export interface RegionChange {
+  parts: string[];
+  detail: RegionDetail;
+}
+
 interface Props {
   payload: RegionPayload;
   /** Called when the user clicks a structure name (asks Claude about it). */
   onSelect?: (part: RegionPart) => void;
+  /** Tooltip on a structure name — host-specific (Claude asks; Obsidian opens a note). */
+  selectHint?: string;
+  /** Called when the user changes the structure list / detail level (persistence). */
+  onChange?: (spec: RegionChange) => void;
+  /** Injected catalog (Obsidian bundles it); when omitted the widget fetches
+   *  `${assetBase}/parts-catalog.json` itself. Enables the in-widget controls. */
+  catalog?: PartsCatalog;
+  /** Injected neighbour-prime (Obsidian uses requestUrl); when omitted the widget
+   *  fetches `${assetBase}/parts-neighbors.json` and primes it. Must be idempotent. */
+  ensureNeighbors?: () => Promise<void>;
 }
 
 // Static control mappings, hoisted so they keep a stable identity across
@@ -28,17 +51,237 @@ const MOUSE_BUTTONS = {
 };
 const TOUCHES = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
-export default function RegionViewer({ payload, onSelect }: Props) {
+const DETAIL_LEVELS: { id: RegionDetail; label: string; hint: string }[] = [
+  { id: 'isolated', label: 'Isolated', hint: 'Only the named structures' },
+  { id: 'related', label: 'Related', hint: 'Add nearest neighbours (translucent)' },
+  { id: 'regional', label: 'Regional', hint: 'Add a wider surrounding context' },
+];
+
+interface Candidate {
+  term: string;
+  note: string;
+}
+
+/** Build the add-structure suggestion index once from the catalog: every unique
+ *  English name + Latin synonym + the region-group aliases. Every term resolves
+ *  through resolveQueryToParts, so an inserted suggestion always renders.
+ *  (Ported from the Obsidian plugin's suggest.ts, minus the editor bits.) */
+function buildCandidates(catalog: PartsCatalog): { terms: string[]; byTerm: Map<string, Candidate> } {
+  const sysLabel = new Map(catalog.systems.map((s) => [s.id, s.label_en]));
+  const byTerm = new Map<string, Candidate>(); // key = lowercased term (dedupe)
+  const add = (raw: string, cand: Candidate) => {
+    const term = raw.trim();
+    if (!term) return;
+    const key = term.toLowerCase();
+    if (!byTerm.has(key)) byTerm.set(key, cand);
+  };
+  for (const p of catalog.parts) {
+    const en = cleanName(p.name_en);
+    const lat = cleanName(p.name_lat);
+    const sys = sysLabel.get(p.system) ?? p.system;
+    add(en, { term: en, note: lat && lat !== en ? `${lat} · ${sys}` : sys });
+    if (lat && lat !== en) add(lat, { term: lat, note: `${en} · ${sys}` });
+  }
+  for (const alias of groupAliasSuggestions()) add(alias, { term: alias, note: 'region group' });
+  const terms = [...byTerm.values()].map((c) => c.term);
+  return { terms, byTerm };
+}
+
+const focusOf = (payload: RegionPayload): RegionPart[] => payload.parts.filter((p) => !p.context);
+
+export default function RegionViewer({ payload, onSelect, selectHint = 'Ask about this structure', onChange, catalog: catalogProp, ensureNeighbors: ensureNeighborsProp }: Props) {
+  const baseUrl = useMemo(() => payload.assetBase.replace(/\/+$/, ''), [payload.assetBase]);
+
+  // --- Editable view state (seeded from the payload, reset on host push) ---
+  const [focusParts, setFocusParts] = useState<RegionPart[]>(() => focusOf(payload));
+  const [detail, setDetail] = useState<RegionDetail>(payload.detail);
+  const [visible, setVisible] = useState<Set<string>>(() => new Set(payload.parts.map((p) => p.id)));
+
+  // Catalog: injected (Obsidian) or self-fetched (MCP). Enables the controls.
+  const [fetchedCatalog, setFetchedCatalog] = useState<PartsCatalog | null>(null);
+  const catalog = catalogProp ?? fetchedCatalog;
+  const [catalogFailed, setCatalogFailed] = useState(false);
+  const [neighborsReady, setNeighborsReady] = useState(false);
+
+  // Refs so async handlers read the latest without re-subscribing.
+  const focusRef = useRef(focusParts);
+  focusRef.current = focusParts;
+  const detailRef = useRef(detail);
+  detailRef.current = detail;
+
+  // Reset internal state when the payload PROP identity changes (host pushed a new
+  // region). Adjust-state-during-render pattern: synchronous, no intermediate frame.
+  const prevPayloadRef = useRef(payload);
+  const prevActiveIdsRef = useRef<string[]>(payload.parts.map((p) => p.id));
+  if (prevPayloadRef.current !== payload) {
+    prevPayloadRef.current = payload;
+    const nf = focusOf(payload);
+    setFocusParts(nf);
+    setDetail(payload.detail);
+    setNeighborsReady(false);
+    setVisible(new Set(payload.parts.map((p) => p.id)));
+    prevActiveIdsRef.current = payload.parts.map((p) => p.id);
+  }
+
+  // Fetch the catalog once (unless injected) so the controls can recompute regions.
+  useEffect(() => {
+    if (catalogProp) return;
+    let cancelled = false;
+    fetch(`${baseUrl}/parts-catalog.json`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status}`);
+        return r.json();
+      })
+      .then((data: PartsCatalog) => {
+        if (cancelled) return;
+        data.parts = data.parts.filter((p) => !p.id.endsWith('.g')); // drop group containers
+        setFetchedCatalog(data);
+      })
+      .catch(() => {
+        if (!cancelled) setCatalogFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [catalogProp, baseUrl]);
+
+  // Ensure the neighbour map is primed (once) — injected or self-fetched. A single
+  // shared promise dedupes concurrent detail switches (last-write-wins downstream).
+  const neighborsPromiseRef = useRef<Promise<void> | null>(null);
+  const ensureNeighbors = useCallback((): Promise<void> => {
+    if (ensureNeighborsProp) return ensureNeighborsProp();
+    if (neighborsPromiseRef.current) return neighborsPromiseRef.current;
+    const pr = fetch(`${baseUrl}/parts-neighbors.json`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`${r.status}`);
+        return r.json();
+      })
+      .then((map) => {
+        primeNeighbors(map);
+      })
+      .catch((err) => {
+        neighborsPromiseRef.current = null; // allow retry
+        throw err;
+      });
+    neighborsPromiseRef.current = pr;
+    return pr;
+  }, [ensureNeighborsProp, baseUrl]);
+
+  // The payload actually rendered: recomputed client-side once the catalog is
+  // available (and neighbours are primed for related/regional); otherwise the
+  // server-built payload, so there is zero flicker before the data loads.
+  const activePayload = useMemo<RegionPayload>(() => {
+    if (catalog && (detail === 'isolated' || neighborsReady)) {
+      return assembleRegion(catalog, focusParts, baseUrl, {
+        detail,
+        title: payload.title,
+        unmatched: payload.unmatched,
+      });
+    }
+    return payload;
+  }, [catalog, detail, neighborsReady, focusParts, payload, baseUrl]);
+
+  const emitChange = useCallback(
+    (parts: RegionPart[], d: RegionDetail) => {
+      onChange?.({ parts: parts.map((p) => p.name_en), detail: d });
+    },
+    [onChange],
+  );
+
+  // --- Detail switch -------------------------------------------------------
+  const [detailBusy, setDetailBusy] = useState(false);
+  const [detailError, setDetailError] = useState(false);
+  const detailTokenRef = useRef(0);
+  const changeDetail = useCallback(
+    (next: RegionDetail) => {
+      if (next === detailRef.current) return;
+      setDetailError(false);
+      const token = ++detailTokenRef.current;
+      if (next === 'isolated' || neighborsReady) {
+        setDetail(next);
+        emitChange(focusRef.current, next);
+        return;
+      }
+      setDetailBusy(true);
+      ensureNeighbors()
+        .then(() => {
+          if (token !== detailTokenRef.current) return; // superseded
+          setNeighborsReady(true);
+          setDetail(next);
+          setDetailBusy(false);
+          emitChange(focusRef.current, next);
+        })
+        .catch(() => {
+          if (token !== detailTokenRef.current) return;
+          setDetailBusy(false);
+          setDetailError(true); // keep current detail
+        });
+    },
+    [neighborsReady, ensureNeighbors, emitChange],
+  );
+
+  // --- Add / remove focus structures --------------------------------------
+  const candidates = useMemo(() => (catalog ? buildCandidates(catalog) : null), [catalog]);
+  const searchStructures = useCallback(
+    (q: string): Candidate[] => {
+      if (!candidates || !q.trim()) return [];
+      const out: Candidate[] = [];
+      for (const m of fuzzyMatchScored(q, candidates.terms, 8)) {
+        const c = candidates.byTerm.get(m.term.toLowerCase());
+        if (c) out.push(c);
+      }
+      return out;
+    },
+    [candidates],
+  );
+  const addStructure = useCallback(
+    (term: string) => {
+      if (!catalog) return;
+      const resolved = resolveQueryToParts(catalog, term);
+      if (!resolved) return;
+      const prev = focusRef.current;
+      const seen = new Set(prev.map((p) => p.id));
+      const next = [...prev];
+      for (const p of resolved.parts) {
+        if (seen.has(p.id)) continue;
+        if (next.length >= MAX_REGION_PARTS) break;
+        seen.add(p.id);
+        next.push({
+          id: p.id,
+          name_en: cleanName(p.name_en),
+          name_lat: cleanName(p.name_lat),
+          system: p.system,
+          side: p.side,
+        });
+      }
+      if (next.length === prev.length) return; // nothing new
+      setFocusParts(next);
+      emitChange(next, detailRef.current);
+    },
+    [catalog, emitChange],
+  );
+  const removeStructure = useCallback(
+    (id: string) => {
+      const prev = focusRef.current;
+      const next = prev.filter((p) => p.id !== id);
+      if (next.length === prev.length) return;
+      setFocusParts(next);
+      emitChange(next, detailRef.current);
+    },
+    [emitChange],
+  );
+  const focusIdSet = useMemo(() => new Set(focusParts.map((p) => p.id)), [focusParts]);
+
+  // --- Derived render data (from activePayload) ---------------------------
   const systemsById = useMemo(() => {
     const m = new Map<string, RegionSystemMeta>();
-    for (const s of payload.systems) m.set(s.id, s);
+    for (const s of activePayload.systems) m.set(s.id, s);
     return m;
-  }, [payload.systems]);
+  }, [activePayload.systems]);
 
-  // Parts grouped by system, in payload order.
   const groups = useMemo(() => {
     const bySys = new Map<string, RegionPart[]>();
-    for (const p of payload.parts) {
+    for (const p of activePayload.parts) {
       const arr = bySys.get(p.system) ?? [];
       arr.push(p);
       bySys.set(p.system, arr);
@@ -47,15 +290,28 @@ export default function RegionViewer({ payload, onSelect }: Props) {
       system: systemsById.get(sysId)!,
       parts,
     }));
-  }, [payload.parts, systemsById]);
+  }, [activePayload.parts, systemsById]);
 
-  // Visibility: focus parts on by default; context parts on but dimmer.
-  const [visible, setVisible] = useState<Set<string>>(
-    () => new Set(payload.parts.map((p) => p.id)),
-  );
+  // Merge visibility across recomputes: keep prior on/off for retained ids,
+  // default-ON new ids, drop removed ids. The host-push hard reset (all-on) is
+  // handled synchronously in the payload-identity block above.
+  const activeIds = useMemo(() => activePayload.parts.map((p) => p.id), [activePayload]);
+  const activeIdsKey = activeIds.join('|');
   useEffect(() => {
-    setVisible(new Set(payload.parts.map((p) => p.id)));
-  }, [payload.parts]);
+    const prev = prevActiveIdsRef.current;
+    if (prev.join('|') === activeIdsKey) return; // unchanged (incl. right after a reset)
+    const prevSet = new Set(prev);
+    setVisible((cur) => {
+      const merged = new Set<string>();
+      for (const id of activeIds) {
+        if (!prevSet.has(id)) merged.add(id); // new → on
+        else if (cur.has(id)) merged.add(id); // retained & was on → on
+      }
+      return merged;
+    });
+    prevActiveIdsRef.current = activeIds;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- activeIdsKey is the stable string proxy for activeIds
+  }, [activeIdsKey]);
 
   const toggle = useCallback((id: string) => {
     setVisible((prev) => {
@@ -67,8 +323,8 @@ export default function RegionViewer({ payload, onSelect }: Props) {
   }, []);
 
   const setAll = useCallback(
-    (on: boolean) => setVisible(on ? new Set(payload.parts.map((p) => p.id)) : new Set()),
-    [payload.parts],
+    (on: boolean) => setVisible(on ? new Set(activeIds) : new Set()),
+    [activeIds],
   );
 
   const [loaded, setLoaded] = useState<Set<string>>(new Set());
@@ -76,17 +332,22 @@ export default function RegionViewer({ payload, onSelect }: Props) {
     setLoaded((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }, []);
   const ready = groups.length > 0 && groups.every((g) => loaded.has(g.system.id));
+  // Once the first full load completes, keep the model up: don't flash the
+  // "Loading 3D…" overlay again when the user adds a not-yet-loaded system.
+  const [everReady, setEverReady] = useState(false);
+  useEffect(() => {
+    if (ready) setEverReady(true);
+  }, [ready]);
 
   const fitKey = useMemo(() => [...visible].sort().join('|'), [visible]);
-  const baseUrl = payload.assetBase.replace(/\/+$/, '');
 
   // Map a GLB node name back to its part, for hover-to-name. Keyed by the
   // sanitized node name (how three exposes it on the mesh / its ancestors).
   const nameByNode = useMemo(() => {
     const m = new Map<string, { id: string; name: string }>();
-    for (const p of payload.parts) m.set(sanitizeNodeName(p.id), { id: p.id, name: p.name_en });
+    for (const p of activePayload.parts) m.set(sanitizeNodeName(p.id), { id: p.id, name: p.name_en });
     return m;
-  }, [payload.parts]);
+  }, [activePayload.parts]);
 
   // Touch devices have no hover, so the follow-cursor tooltip + per-move
   // pointer tracking are pointless there — and that per-move setState re-renders
@@ -101,8 +362,7 @@ export default function RegionViewer({ payload, onSelect }: Props) {
   const [refitNonce, setRefitNonce] = useState(0);
   const recenter = useCallback(() => setRefitNonce((n) => n + 1), []);
 
-  // On-device scroll diagnostic (triple-tap the legend header). Temporary.
-  const [debug, setDebug] = useState(false);
+  const canEdit = !!catalog;
 
   return (
     <div className="am-viewport">
@@ -140,10 +400,11 @@ export default function RegionViewer({ payload, onSelect }: Props) {
           mouseButtons={MOUSE_BUTTONS}
           touches={TOUCHES}
         />
-        <Suspense fallback={null}>
-          {groups.map((g) => (
+        {groups.map((g) => (
+          // Per-system Suspense so adding a not-yet-loaded system doesn't blank
+          // the already-rendered ones while its GLB loads.
+          <Suspense key={g.system.id} fallback={null}>
             <SystemGroup
-              key={g.system.id}
               url={`${baseUrl}/${g.system.glb}`}
               tint={g.system.tint}
               systemId={g.system.id}
@@ -151,8 +412,8 @@ export default function RegionViewer({ payload, onSelect }: Props) {
               visible={visible}
               onLoaded={onLoaded}
             />
-          ))}
-        </Suspense>
+          </Suspense>
+        ))}
         <Fit fitKey={`${fitKey}#${refitNonce}`} ready={ready} />
         <PanClamp ready={ready} />
         <CanvasGestureLock />
@@ -160,7 +421,7 @@ export default function RegionViewer({ payload, onSelect }: Props) {
         {!coarse && <Hoverer nameByNode={nameByNode} visible={visible} onHover={setHoverName} />}
       </Canvas>
 
-      {!ready && <div className="am-loading">Loading 3D…</div>}
+      {!everReady && <div className="am-loading">Loading 3D…</div>}
 
       <button className="am-recenter" onClick={recenter} title="Recenter view" aria-label="Recenter view">
         <RecenterIcon />
@@ -172,8 +433,8 @@ export default function RegionViewer({ payload, onSelect }: Props) {
         </div>
       )}
 
-      {payload.unmatched.length > 0 && (
-        <div className="am-unmatched">Not found: {payload.unmatched.join(', ')}</div>
+      {activePayload.unmatched.length > 0 && (
+        <div className="am-unmatched">Not found: {activePayload.unmatched.join(', ')}</div>
       )}
     </div>
 
@@ -186,10 +447,18 @@ export default function RegionViewer({ payload, onSelect }: Props) {
       onToggle={toggle}
       onSetAll={setAll}
       onSelect={onSelect}
-      onDebug={() => setDebug((d) => !d)}
+      selectHint={selectHint}
+      detail={detail}
+      onDetail={changeDetail}
+      detailBusy={detailBusy}
+      detailError={detailError}
+      canEdit={canEdit}
+      catalogFailed={catalogFailed}
+      onSearch={searchStructures}
+      onAdd={addStructure}
+      onRemove={removeStructure}
+      focusIds={focusIdSet}
     />
-
-    {debug && <DebugOverlay onClose={() => setDebug(false)} />}
     </div>
   );
 }
@@ -205,7 +474,16 @@ interface SystemGroupProps {
 
 function SystemGroup({ url, tint, systemId, parts, visible, onLoaded }: SystemGroupProps) {
   const { scene: source } = useGLTF(url);
-  const cloned = useMemo(() => source.clone(true), [source]);
+
+  // Re-clone when the focus/context partition changes (a part added, removed, or
+  // flipped focus<->context). applyTint's __tinted/__ctxTinted guards never revert
+  // a mesh, so a stale clone would keep a promoted context part translucent — a
+  // fresh clone clears the flags and re-tints correctly.
+  const partitionKey = useMemo(
+    () => parts.map((p) => `${p.id}${p.context ? 'c' : 'f'}`).sort().join('|'),
+    [parts],
+  );
+  const cloned = useMemo(() => source.clone(true), [source, partitionKey]);
 
   const visibleIds = useMemo(
     () => parts.filter((p) => visible.has(p.id)).map((p) => p.id),
@@ -224,7 +502,8 @@ function SystemGroup({ url, tint, systemId, parts, visible, onLoaded }: SystemGr
   useEffect(() => {
     setVisibleParts(cloned, visibleIds);
     onLoaded(systemId);
-  }, [cloned, idsKey, systemId, onLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- idsKey is the stable string proxy for visibleIds
+  }, [cloned, idsKey, systemId, onLoaded]);
 
   return <primitive object={cloned} />;
 }
@@ -385,18 +664,74 @@ interface LegendProps {
   onToggle: (id: string) => void;
   onSetAll: (on: boolean) => void;
   onSelect?: (part: RegionPart) => void;
-  onDebug?: () => void;
+  selectHint: string;
+  detail: RegionDetail;
+  onDetail: (d: RegionDetail) => void;
+  detailBusy: boolean;
+  detailError: boolean;
+  canEdit: boolean;
+  catalogFailed: boolean;
+  onSearch: (q: string) => Candidate[];
+  onAdd: (term: string) => void;
+  onRemove: (id: string) => void;
+  focusIds: Set<string>;
 }
 
-function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: LegendProps) {
+function Legend({
+  groups,
+  visible,
+  onToggle,
+  onSetAll,
+  onSelect,
+  selectHint,
+  detail,
+  onDetail,
+  detailBusy,
+  detailError,
+  canEdit,
+  catalogFailed,
+  onSearch,
+  onAdd,
+  onRemove,
+  focusIds,
+}: LegendProps) {
   const [collapsed, setCollapsed] = useState(
     () => typeof window !== 'undefined' && window.innerWidth < 560,
   );
+  // Horizontal (pill) state lags the vertical one so the fold reads as two beats —
+  // close: shrink height, THEN width; open: widen, THEN unfold. (Width
+  // auto<->max-content can't be tweened or reliably deferred in CSS, so the
+  // ordering is timed here rather than via transition-delay.)
+  const [narrowed, setNarrowed] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 560,
+  );
+  const foldTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  useEffect(() => () => clearTimeout(foldTimer.current), []);
+  const toggleFold = useCallback(() => {
+    clearTimeout(foldTimer.current);
+    if (!collapsed) {
+      setCollapsed(true);                                            // close height now
+      foldTimer.current = setTimeout(() => setNarrowed(true), 280);  // then width
+    } else {
+      setNarrowed(false);                                            // open width now
+      foldTimer.current = setTimeout(() => setCollapsed(false), 280); // then height
+    }
+  }, [collapsed]);
   const total = groups.reduce((n, g) => n + g.parts.length, 0);
   const shown = groups.reduce(
     (n, g) => n + g.parts.filter((p) => visible.has(p.id)).length,
     0,
   );
+
+  // Add-structure search box (results as an absolute overlay so its height never
+  // perturbs the measured legend-body cap below).
+  const [addOpen, setAddOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const results = useMemo(() => (addOpen ? onSearch(query) : []), [addOpen, query, onSearch]);
+  const pick = (term: string) => {
+    onAdd(term);
+    setQuery('');
+  };
 
   // iOS won't reliably scroll a list sized only by flex/grid; give the body an
   // explicit measured pixel max-height so it's a definite, scrollable box.
@@ -404,19 +739,25 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
   useEffect(() => {
     const body = bodyRef.current;
     if (!body || collapsed) return;
-    const legend = body.closest('.am-legend') as HTMLElement | null;
+    const legendNode = body.closest('.am-legend');
+    const legend = legendNode instanceof HTMLElement ? legendNode : null;
     const viewport = legend?.parentElement;
     if (!legend || !viewport) return;
+    const px = (root: ParentNode, sel: string, fb: number) => {
+      const el = root.querySelector(sel);
+      return el instanceof HTMLElement ? el.offsetHeight : fb;
+    };
     const fit = () => {
-      const head = (legend.querySelector('.am-legend-head') as HTMLElement | null)?.offsetHeight || 44;
-      const actions = (legend.querySelector('.am-legend-actions') as HTMLElement | null)?.offsetHeight || 44;
-      const credit = (legend.querySelector('.am-legend-credit') as HTMLElement | null)?.offsetHeight || 0;
+      const head = px(legend, '.am-legend-head', 44);
+      const controls = px(legend, '.am-legend-controls', 0);
+      const actions = px(legend, '.am-legend-actions', 44);
+      const credit = px(legend, '.am-legend-credit', 0);
       // Base the bound on the VIEWPORT's fixed height (stable), not the legend's
       // animating height — mirrors the CSS cap min(80%, 100% - 1rem) — minus the
-      // header + actions + attribution footer. A definite px height is what makes
-      // iOS scroll the list.
+      // header + controls + actions + attribution footer. A definite px height is
+      // what makes iOS scroll the list.
       const cap = Math.min(viewport.clientHeight * 0.8, viewport.clientHeight - 16);
-      const avail = Math.round(cap - head - actions - credit - 10);
+      const avail = Math.round(cap - head - controls - actions - credit - 10);
       body.style.maxHeight = avail > 96 ? `${avail}px` : '';
     };
     fit();
@@ -425,27 +766,13 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
     const ro = new ResizeObserver(fit);
     ro.observe(viewport);
     return () => ro.disconnect();
-  }, [collapsed, groups]);
-
-  // Triple-tap the header to open the on-device scroll diagnostic.
-  const tapsRef = useRef<number[]>([]);
-  const onHeadClick = () => {
-    const now = typeof performance !== 'undefined' ? performance.now() : 0;
-    tapsRef.current = [...tapsRef.current.filter((t) => now - t < 800), now];
-    if (tapsRef.current.length >= 3 && onDebug) {
-      tapsRef.current = [];
-      setCollapsed(false);
-      onDebug();
-      return;
-    }
-    setCollapsed((c) => !c);
-  };
+  }, [collapsed, groups, addOpen]);
 
   return (
-    <div className={`am-legend${collapsed ? ' am-collapsed' : ''}`}>
+    <div className={`am-legend${collapsed ? ' am-collapsed' : ''}${narrowed ? ' am-narrow' : ''}${addOpen && canEdit ? ' am-adding' : ''}`}>
       <button
         className="am-legend-head"
-        onClick={onHeadClick}
+        onClick={toggleFold}
         aria-expanded={!collapsed}
         title={collapsed ? 'Expand legend' : 'Collapse legend'}
       >
@@ -456,6 +783,65 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
 
       <div className="am-legend-collapse" aria-hidden={collapsed}>
         <div className="am-legend-collapse-inner">
+          <div className="am-legend-controls">
+            <div className="am-detail" role="group" aria-label="Detail level">
+              {DETAIL_LEVELS.map((d) => (
+                <button
+                  key={d.id}
+                  className={`am-seg${detail === d.id ? ' am-seg-on' : ''}`}
+                  onClick={() => onDetail(d.id)}
+                  disabled={!canEdit || detailBusy}
+                  title={d.hint}
+                  aria-pressed={detail === d.id}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+            {detailBusy && <div className="am-control-note">Loading context…</div>}
+            {detailError && <div className="am-control-note am-control-err">Context data unavailable.</div>}
+
+            <div className="am-add">
+              <button
+                className="am-add-toggle"
+                onClick={() => setAddOpen((o) => !o)}
+                disabled={!canEdit}
+                title={canEdit ? 'Add a structure' : catalogFailed ? 'Structure list unavailable' : 'Loading structures…'}
+                aria-expanded={addOpen}
+              >
+                <PlusIcon /> Add structure
+              </button>
+              {addOpen && canEdit && (
+                <div className="am-add-field">
+                  <input
+                    className="am-add-input"
+                    type="text"
+                    value={query}
+                    autoFocus
+                    placeholder="Search structures…"
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && results[0]) pick(results[0].term);
+                      else if (e.key === 'Escape') setAddOpen(false);
+                    }}
+                  />
+                  {results.length > 0 && (
+                    <ul className="am-add-results">
+                      {results.map((r) => (
+                        <li key={r.term}>
+                          <button className="am-add-result" onClick={() => pick(r.term)}>
+                            <span className="am-add-term">{r.term}</span>
+                            {r.note && <span className="am-add-note">{r.note}</span>}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="am-legend-actions">
             <button className="am-btn" onClick={() => onSetAll(true)}>Show all</button>
             <button className="am-btn" onClick={() => onSetAll(false)}>Hide all</button>
@@ -466,6 +852,7 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
                 {groups.length > 1 && <div className="am-sys-head">{g.system.label_en}</div>}
                 {g.parts.map((p) => {
                   const on = visible.has(p.id);
+                  const removable = focusIds.has(p.id);
                   return (
                     <div key={p.id} className={`am-row${on ? '' : ' am-off'}${p.context ? ' am-ctx' : ''}`}>
                       <button
@@ -477,10 +864,19 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
                         <span className="am-swatch" style={{ background: g.system.tint }} />
                         {on ? <EyeIcon /> : <EyeOffIcon />}
                       </button>
-                      <button className="am-name" onClick={() => onSelect?.(p)} title="Ask about this structure">
+                      <button className="am-name" onClick={() => onSelect?.(p)} title={selectHint}>
                         <span className="am-name-en">{p.name_en}</span>
                         {p.context && <span className="am-ctx-tag">ctx</span>}
                       </button>
+                      {removable && (
+                        <button
+                          className="am-remove"
+                          title="Remove from view"
+                          onClick={() => onRemove(p.id)}
+                        >
+                          <XIcon />
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -495,80 +891,6 @@ function Legend({ groups, visible, onToggle, onSetAll, onSelect, onDebug }: Lege
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-/** TEMPORARY on-device scroll diagnostic. Triple-tap the legend header to open.
- *  Reports whether the list is a bounded scroll box (sh>ch) and the touch-action /
- *  backdrop-filter / transform of every ancestor, plus a live touch counter — so a
- *  real iPhone can tell us why the list won't scroll (it scrolls in Chromium). */
-function DebugOverlay({ onClose }: { onClose: () => void }) {
-  const [text, setText] = useState('measuring…');
-  const t = useRef({ moves: 0, top: 0, max: 0 });
-  useEffect(() => {
-    const body = document.querySelector('.am-legend-body') as HTMLElement | null;
-    const onMove = () => {
-      if (!body) return;
-      t.current.moves += 1;
-      t.current.top = Math.round(body.scrollTop);
-      t.current.max = Math.max(t.current.max, t.current.top);
-    };
-    body?.addEventListener('touchmove', onMove, { passive: true });
-    body?.addEventListener('scroll', onMove, { passive: true });
-    const read = () => {
-      if (!body) {
-        setText('no .am-legend-body in DOM');
-        return;
-      }
-      const cs = getComputedStyle(body);
-      const scrollable = body.scrollHeight > body.clientHeight + 1;
-      const L: string[] = [];
-      // Most important first (never cut off): live scroll + verdict.
-      if (body.clientHeight < 24) {
-        L.push('⚠ LEGEND IS COLLAPSED — tap the LEGEND pill to expand the list, THEN drag it');
-      }
-      L.push(`▶ DRAG THE LIST → scrollTop=${Math.round(body.scrollTop)} moves=${t.current.moves} maxTop=${t.current.max}`);
-      L.push(`scrollable=${scrollable ? 'YES' : 'NO'}  ch=${body.clientHeight} sh=${body.scrollHeight} maxH=${cs.maxHeight}`);
-      L.push(`overflowY=${cs.overflowY} ta=${cs.touchAction} wkScroll=${cs.getPropertyValue('-webkit-overflow-scrolling') || 'n/a'}`);
-      let el: HTMLElement | null = body;
-      for (let i = 0; el && i < 9; i++) {
-        const c = getComputedStyle(el);
-        const name = typeof el.className === 'string' && el.className ? '.' + el.className.split(' ')[0] : el.tagName;
-        const bf = c.getPropertyValue('backdrop-filter') || c.getPropertyValue('-webkit-backdrop-filter');
-        const maxH = c.maxHeight === 'none' ? '-' : c.maxHeight;
-        L.push(`${name} of=${c.overflow} maxH=${maxH} tf=${c.transform !== 'none' ? 'Y' : 'n'} bf=${bf && bf !== 'none' ? 'Y' : 'n'} ta=${c.touchAction}`);
-        if (el.classList?.contains('am-legend')) break;
-        el = el.parentElement;
-      }
-      L.push(`UA ${navigator.userAgent}`);
-      setText(L.join('\n'));
-    };
-    read();
-    const id = window.setInterval(read, 350);
-    return () => {
-      window.clearInterval(id);
-      body?.removeEventListener('touchmove', onMove);
-      body?.removeEventListener('scroll', onMove);
-    };
-  }, []);
-  return (
-    <div
-      style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 60, maxHeight: '52%',
-        overflow: 'auto', background: 'rgba(0,0,0,0.9)', color: '#3f3',
-        font: '11px/1.4 ui-monospace, monospace', padding: '8px 10px',
-        whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-      }}
-    >
-      <button
-        onClick={onClose}
-        style={{ float: 'right', background: '#fff', color: '#000', border: 0, borderRadius: 6, padding: '3px 10px', fontSize: 13, fontFamily: 'sans-serif' }}
-      >
-        close ✕
-      </button>
-      <div style={{ fontWeight: 700, marginBottom: 4 }}>scroll diagnostic</div>
-      {text}
     </div>
   );
 }
@@ -602,6 +924,21 @@ function EyeOffIcon() {
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
       <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+function PlusIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}
+function XIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+      <path d="M6 6 L18 18 M18 6 L6 18" />
     </svg>
   );
 }

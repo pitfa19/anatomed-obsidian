@@ -12,5 +12,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["main.tsx", "src", "widget"]
+  "include": ["main.tsx", "suggest.ts", "src", "widget"]
 }
