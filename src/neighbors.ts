@@ -1,7 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import type { Part, PartsCatalog, SystemId } from './vendor/types';
 import { getPartIndex } from './catalog.js';
+
+// NOTE: browser (Obsidian-plugin) copy of the anatomed-mcp module. It drops the
+// server's disk-based neighbour loader: the plugin fetches parts-neighbors.json at
+// runtime and seeds it via primeNeighbors(), so this build never reads from disk.
 
 interface Neighbor {
   id: string;
@@ -10,21 +12,11 @@ interface Neighbor {
 }
 type NeighborMap = Record<string, Neighbor[]>;
 
-// Resolved from CWD: project root locally, the Lambda task root on Vercel.
-const NEIGHBORS_PATH = resolve(process.cwd(), 'assets/parts-neighbors.json');
-
 let cache: NeighborMap | null = null;
 
-function loadNeighbors(): NeighborMap {
-  if (cache) return cache;
-  cache = JSON.parse(readFileSync(NEIGHBORS_PATH, 'utf8')) as NeighborMap;
-  return cache;
-}
-
-/** Seed the neighbour map directly instead of reading it from disk. Used by
- *  browser hosts (e.g. the Obsidian plugin) that ship parts-neighbors.json as a
- *  bundled/sidecar asset, so `contextFor` never touches `fs`. The Node server
- *  keeps using `loadNeighbors` unchanged. */
+/** Seed the neighbour map directly instead of reading it from disk. The plugin
+ *  ships parts-neighbors.json as a runtime-fetched asset and primes it here, so
+ *  `contextFor` never reads from disk. */
 export function primeNeighbors(map: NeighborMap): void {
   cache = map;
 }
@@ -32,14 +24,15 @@ export function primeNeighbors(map: NeighborMap): void {
 /** Surrounding-context structures for a set of focus parts: the nearest
  *  precomputed neighbours (by AABB-to-AABB distance) across all systems —
  *  i.e. the structures each focus part passes through / runs near. Ranked by
- *  closest-to-any-focus, de-duped, excluding the focus set, capped. */
+ *  closest-to-any-focus, de-duped, excluding the focus set, capped.
+ *  Returns [] if the neighbour map hasn't been primed yet. */
 export function contextFor(
   catalog: PartsCatalog,
   focusIds: string[],
   perPart: number,
   cap: number,
 ): Part[] {
-  const neighbors = loadNeighbors();
+  const neighbors = cache ?? {};
   const index = getPartIndex(catalog);
   const focus = new Set(focusIds);
 

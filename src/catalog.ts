@@ -1,21 +1,8 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import type { PartsCatalog, SystemId, SystemMeta } from './vendor/types';
 
-// Resolved from CWD: project root locally, the Lambda task root on Vercel.
-const CATALOG_PATH = resolve(process.cwd(), 'assets/parts-catalog.json');
-
-let cache: PartsCatalog | null = null;
-
-/** Load the committed parts catalog from disk (once). Drops Z-Anatomy
- *  top-level group containers (".g") exactly like the web app's loader. */
-export function loadCatalog(): PartsCatalog {
-  if (cache) return cache;
-  const data = JSON.parse(readFileSync(CATALOG_PATH, 'utf8')) as PartsCatalog;
-  data.parts = data.parts.filter((p) => !p.id.endsWith('.g'));
-  cache = data;
-  return data;
-}
+// NOTE: browser (Obsidian-plugin) copy of the anatomed-mcp module. It intentionally
+// drops the server's disk-based catalog loader: the plugin bundles parts-catalog.json
+// and injects it directly (see main.tsx), so nothing here ever reads from disk.
 
 export function getSystem(catalog: PartsCatalog, id: SystemId): SystemMeta | null {
   return catalog.systems.find((s) => s.id === id) ?? null;
