@@ -1,0 +1,59 @@
+name: Release Obsidian plugin
+
+# Cut a release by pushing a tag that equals manifest.json "version" (e.g. 0.1.2):
+#   git tag 0.1.2 && git push origin 0.1.2
+# The job builds the plugin, generates GitHub artifact attestations (build
+# provenance) for the release assets, and publishes a GitHub Release with
+# main.js + manifest.json + styles.css attached as individual files — the
+# layout the Obsidian community-plugin directory bot expects.
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write # create the release + upload assets
+  id-token: write # required by attest-build-provenance (OIDC)
+  attestations: write # write the provenance attestation
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Install & build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            main.js
+            styles.css
+            manifest.json
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          # Fail early if the tag doesn't match the manifest version.
+          manifest_version="$(node -p "require('./manifest.json').version")"
+          if [ "$tag" != "$manifest_version" ]; then
+            echo "::error::tag ($tag) != manifest.json version ($manifest_version)"
+            exit 1
+          fi
+          gh release create "$tag" \
+            --title "$tag" \
+            --notes "Automated release for $tag. Assets carry GitHub build-provenance attestations." \
+            main.js manifest.json styles.css

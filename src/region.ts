@@ -41,7 +41,7 @@ export function buildRegion(
   opts: BuildRegionOptions = {},
 ): BuildRegionResult {
   const detail: RegionDetail = opts.detail ?? 'isolated';
-  const parts: RegionPart[] = [];
+  const focus: RegionPart[] = [];
   const seen = new Set<string>();
   const unmatched: string[] = [];
   const expanded: NonNullable<RegionPayload['expanded']> = [];
@@ -60,12 +60,12 @@ export function buildRegion(
     }
     for (const p of resolved.parts) {
       if (seen.has(p.id)) continue;
-      if (parts.length >= MAX_REGION_PARTS) {
+      if (focus.length >= MAX_REGION_PARTS) {
         truncated = true;
         break;
       }
       seen.add(p.id);
-      parts.push({
+      focus.push({
         id: p.id, // raw id — must match the GLB node name
         name_en: cleanName(p.name_en),
         name_lat: cleanName(p.name_lat),
@@ -76,10 +76,58 @@ export function buildRegion(
     if (truncated) break;
   }
 
+  const payload = assembleRegion(catalog, focus, assetBase, {
+    detail,
+    title: opts.title,
+    unmatched,
+    expanded,
+  });
+
+  const focusCount = payload.parts.filter((p) => !p.context).length;
+  const contextCount = payload.parts.filter((p) => p.context).length;
+  const summary = buildSummary(payload, focusCount, contextCount, truncated);
+  return { payload, summary };
+}
+
+export interface AssembleRegionOptions {
+  detail: RegionDetail;
+  title?: string;
+  unmatched?: string[];
+  expanded?: RegionPayload['expanded'];
+}
+
+/** Assemble a bounded RegionPayload from ALREADY-RESOLVED focus parts: dedupe + cap the
+ *  focus, add surrounding context (nearest neighbours) for related/regional detail, and
+ *  build the systems + title. Shared by buildRegion (server) and the widget's live
+ *  client-side recompute (detail switch / add / remove). Focus parts are assumed already
+ *  cleaned (see cleanName); only freshly-pulled context parts are cleaned here. */
+export function assembleRegion(
+  catalog: PartsCatalog,
+  focusParts: RegionPart[],
+  assetBase: string,
+  opts: AssembleRegionOptions,
+): RegionPayload {
+  const detail = opts.detail;
+  const parts: RegionPart[] = [];
+  const seen = new Set<string>();
+
+  for (const p of focusParts) {
+    if (seen.has(p.id)) continue;
+    if (parts.length >= MAX_REGION_PARTS) break;
+    seen.add(p.id);
+    // Drop any stray context flag — these are focus structures.
+    parts.push({
+      id: p.id,
+      name_en: p.name_en,
+      name_lat: p.name_lat,
+      system: p.system,
+      side: p.side,
+    });
+  }
+
   // Surrounding context (structures the focus parts pass through / near).
   const focusIds = parts.map((p) => p.id);
   const tuning = DETAIL_TUNING[detail];
-  let contextCount = 0;
   if (tuning.perPart > 0 && focusIds.length > 0) {
     const ctx = contextFor(catalog, focusIds, tuning.perPart, tuning.cap);
     for (const p of ctx) {
@@ -93,7 +141,6 @@ export function buildRegion(
         side: p.side,
         context: true,
       });
-      contextCount++;
     }
   }
 
@@ -108,26 +155,24 @@ export function buildRegion(
     };
   });
 
-  const focusParts = parts.filter((p) => !p.context);
-  const resolvedTitle = opts.title?.trim() || deriveTitle(focusParts, expanded);
+  const focusOnly = parts.filter((p) => !p.context);
+  const expanded = opts.expanded ?? [];
+  const resolvedTitle = opts.title?.trim() || deriveTitle(focusOnly, expanded);
 
-  const payload: RegionPayload = {
+  return {
     schema: REGION_SCHEMA,
     title: resolvedTitle,
     assetBase,
     parts,
     systems,
     detail,
-    unmatched,
+    unmatched: opts.unmatched ?? [],
     expanded: expanded.length ? expanded : undefined,
   };
-
-  const summary = buildSummary(payload, focusParts.length, contextCount, truncated);
-  return { payload, summary };
 }
 
 /** Strip the trailing Blender duplicate suffix (".001") from a display name. */
-function cleanName(name: string): string {
+export function cleanName(name: string): string {
   return name.replace(/\.\d{3}$/, '');
 }
 
@@ -135,7 +180,7 @@ function deriveTitle(
   focusParts: RegionPart[],
   expanded: NonNullable<RegionPayload['expanded']>,
 ): string {
-  if (expanded.length === 1 && focusParts.length > 1) return expanded[0]!.label;
+  if (expanded.length === 1 && focusParts.length > 1) return expanded[0].label;
   if (focusParts.length === 0) return 'Anatomy';
   const names = [...new Set(focusParts.map((p) => p.name_en))];
   if (names.length <= 3) return names.join(', ');

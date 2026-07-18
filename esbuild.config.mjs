@@ -4,7 +4,7 @@
 // (see ensureNeighbors in main.tsx). React/three/drei are bundled from
 // devDependencies. Standalone: everything it needs is vendored in this repo.
 import esbuild from 'esbuild';
-import builtins from 'builtin-modules';
+import { builtinModules as builtins } from 'node:module';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -12,30 +12,35 @@ import { dirname, resolve } from 'node:path';
 const here = dirname(fileURLToPath(import.meta.url));
 const prod = process.argv.includes('--prod') || process.env.NODE_ENV === 'production';
 
-// Neutralize react-dom's dead <script>-hoisting code. React 19's DOM client contains
-// `document.createElement("script")` in its resource/preinit ("Float") machinery, used
+// Neutralize react-dom's dead <script>-hoisting code. React 19's DOM client builds
+// executable <script> nodes two ways in its resource/preinit ("Float") machinery:
+// `createElement("script")` and a `div.innerHTML = "<script></script>"` trick — used
 // ONLY when an app renders a <script> element or calls ReactDOM.preinit / preload. This
-// plugin does neither, so that code is unreachable — but Obsidian's automated review
+// plugin does neither, so both paths are unreachable — but Obsidian's automated review
 // flags the mere PRESENCE of dynamic <script> creation as a policy violation. We rewrite
-// the literal to an inert <template> in the (dead) react-dom source, so the shipped bundle
-// contains no dynamic <script> creation. Guarded: if react-dom changes the number of sites,
-// the build fails loudly so we re-verify rather than silently shipping unpatched code.
+// both to an inert <template> in the (dead) react-dom source, so the shipped bundle
+// contains no dynamic <script> creation. Guarded PER pattern: if react-dom changes the
+// number of sites, the build fails loudly so we re-verify rather than silently shipping.
 const neutralizeReactDomScriptHoisting = {
   name: 'neutralize-reactdom-script-hoisting',
   setup(build) {
     build.onLoad(
       { filter: /react-dom[\\/]cjs[\\/]react-dom-client\.(production|development)\.js$/ },
       (args) => {
-        const src = readFileSync(args.path, 'utf8');
-        const NEEDLE = 'createElement("script")';
-        const sites = src.split(NEEDLE).length - 1;
-        if (sites !== 3) {
-          throw new Error(
-            `[anatomed] expected 3 dead ${NEEDLE} sites in ${args.path}, found ${sites}. ` +
-              `react-dom likely changed — re-verify the <script>-hoisting neutralization before shipping.`,
-          );
-        }
-        return { contents: src.split(NEEDLE).join('createElement("template")'), loader: 'js' };
+        let src = readFileSync(args.path, 'utf8');
+        const patch = (needle, repl, want) => {
+          const found = src.split(needle).length - 1;
+          if (found !== want) {
+            throw new Error(
+              `[anatomed] expected ${want}x \`${needle}\` in ${args.path}, found ${found}. ` +
+                `react-dom changed — re-verify the <script>-hoisting neutralization before shipping.`,
+            );
+          }
+          src = src.split(needle).join(repl);
+        };
+        patch('createElement("script")', 'createElement("template")', 3);
+        patch('"<script>\\x3c/script>"', '"<template>\\x3c/template>"', 1);
+        return { contents: src, loader: 'js' };
       },
     );
   },
@@ -58,6 +63,21 @@ await esbuild.build({
   logLevel: 'info',
 });
 
+// Safety net for the neutralization above: the shipped bundle must contain NO dynamic
+// <script> creation (Obsidian's "code obfuscation" review rejects it). Fail the build
+// loudly if any token leaks through, rather than shipping a bundle that gets flagged.
+{
+  const bundle = readFileSync(resolve(here, 'main.js'), 'utf8');
+  const forbidden = ['createElement("script")', "createElement('script')", '<script'];
+  const leaks = forbidden.filter((tok) => bundle.includes(tok));
+  if (leaks.length) {
+    throw new Error(
+      `[anatomed] main.js contains dynamic <script> creation tokens: ${leaks.join(', ')}. ` +
+        `The react-dom <script>-hoisting neutralization is incomplete — re-verify before shipping.`,
+    );
+  }
+}
+
 // 2) Emit styles.css from the widget CSS, SCOPED so it can't restyle the Obsidian
 //    app itself. The widget assumes it owns the whole document (it runs in an
 //    iframe); in a note we must confine the resets + variables to .am-root.
@@ -70,8 +90,8 @@ const scope = [
     '.am-root { overscroll-behavior: none; }',
   ],
   [
-    'body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }',
-    '.am-root { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }',
+    'body { font-family: var(--font-interface, sans-serif); }',
+    '.am-root { font-family: var(--font-interface, sans-serif); }',
   ],
 ];
 for (const [from, to] of scope) {
@@ -85,7 +105,10 @@ for (const [from, to] of scope) {
 }
 css +=
   '\n/* Obsidian embed helpers */\n' +
-  '.am-embed-msg { color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0; }\n';
+  '.am-embed-msg { color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem 0; }\n' +
+  '/* Structure autocomplete (EditorSuggest popup; rendered outside .am-root) */\n' +
+  '.anatomed-suggest-item { display: flex; align-items: baseline; gap: 0.75em; }\n' +
+  '.anatomed-suggest-note { margin-left: auto; color: var(--text-muted); font-size: 0.82em; white-space: nowrap; }\n';
 writeFileSync(resolve(here, 'styles.css'), css);
 
 console.log(`[anatomed] obsidian plugin built (${prod ? 'prod' : 'dev'}).`);

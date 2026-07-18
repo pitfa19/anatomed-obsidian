@@ -25,12 +25,23 @@
 /* overscroll-behavior:none stops a gesture inside the widget from chaining out
    to scroll the surrounding Claude chat (esp. iOS). */
 html, body, #root { margin: 0; height: 100%; width: 100%; overscroll-behavior: none; }
-body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+/* Obsidian: match the app's interface font. (anatomed-mcp's iframe copy keeps a
+   platform system-font stack — there is no --font-interface there; don't port this line.) */
+body { font-family: var(--font-interface, sans-serif); }
 
 .am-root {
   display: flex;
   flex-direction: column;
   height: clamp(440px, 72vh, 680px);
+  /* A block-level flex box fills its container's width on its own — do NOT set an
+     explicit `width:100%` here. As a bare <div> in Obsidian the wrapper can carry an
+     inherited horizontal margin; `width:100%` ignores that margin and pushes the box's
+     RIGHT edge past the wrapper, so the right-anchored legend + its CC-BY credit (which
+     ride inside this overflow:hidden box) appear to "stick out" to the right. `width:auto`
+     (the default) subtracts any such margin and never overruns; margin:0 + max-width pin
+     it flush. All a no-op in Claude's iframe, where the box already fits exactly. */
+  max-width: 100%;
+  margin: 0;
   background: var(--bg);
   color: var(--fg);
   overflow: hidden;
@@ -56,6 +67,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
   display: flex;
 }
 
@@ -64,6 +76,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   position: relative;
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
   background:
     radial-gradient(120% 120% at 50% 30%, color-mix(in srgb, var(--stage-bg) 60%, transparent), var(--stage-bg));
@@ -73,7 +86,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
    instead of scrolling the surrounding chat. NOTE: iOS/WKWebView ignores this
    inside a sandboxed iframe — the real stopper is the non-passive touchmove
    preventDefault in <CanvasGestureLock>. The legend list re-enables pan-y. */
-.am-canvas canvas { display: block; width: 100% !important; height: 100% !important; touch-action: none; }
+.am-canvas canvas { display: block; width: 100%; height: 100%; touch-action: none; }
 
 .am-loading {
   position: absolute;
@@ -132,12 +145,18 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
-.am-legend.am-collapsed { width: max-content; }
-/* When collapsed, the (hidden) body's nowrap content would otherwise stretch the
+/* Fold ORDERING is driven in JS (see Legend's toggle): on close the VERTICAL state
+   (.am-collapsed → the body's height eases to 0 + fades over 0.28s) flips first, and
+   only ~0.28s later does the HORIZONTAL state (.am-narrow → the panel shrinks to the
+   header pill); on open the order reverses (widen, then unfold). The width
+   (auto<->max-content) isn't interpolable and can't be reliably deferred by a CSS
+   transition-delay in Chromium (it snaps immediately), so JS sequences the two beats
+   and the width is a clean snap that lands once the height animation has finished. */
+.am-legend.am-narrow { width: max-content; }
+/* When narrowed, the (hidden) body's nowrap content would otherwise stretch the
    legend to full width; zero its width so the pill sizes to just its header. */
-.am-legend.am-collapsed .am-legend-collapse { width: 0; }
+.am-legend.am-narrow .am-legend-collapse { width: 0; }
 
-/* Collapse/expand: animate the body's height (grid-rows 1fr<->0fr) + fade. */
 .am-legend-collapse {
   display: grid;
   grid-template-rows: 1fr;
@@ -147,7 +166,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   flex: 1 1 auto;
   min-height: 0;
   opacity: 1;
-  transition: grid-template-rows 0.24s ease, opacity 0.2s ease;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease;
 }
 .am-legend.am-collapsed .am-legend-collapse {
   grid-template-rows: 0fr;
@@ -157,7 +176,14 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
+  /* Lift via margin (NOT transform): a `transform` on this overflow:hidden ancestor
+     breaks iOS touch-scroll of .am-legend-body (see the note on .am-legend). */
+  transition: margin-top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.am-legend.am-collapsed .am-legend-collapse-inner {
+  margin-top: -4px;
 }
 
 .am-legend-head {
@@ -175,7 +201,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 }
 .am-legend-title { font-size: 0.72rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.03em; }
 .am-muted { color: var(--muted); font-weight: 400; font-size: 0.72rem; }
-.am-chev { transition: transform 0.15s ease; flex: 0 0 auto; }
+.am-chev { transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1); flex: 0 0 auto; }
 .am-chev-open { transform: rotate(90deg); }
 
 .am-legend-actions {
@@ -193,6 +219,164 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   cursor: pointer;
 }
 .am-btn:hover { background: var(--surface-2); }
+
+/* In-widget controls: detail-level selector + add-structure search. Sits between
+   the header and the Show/Hide actions; its height is measured by the legend's
+   fit() so the scroll body below stays a definite (iOS-scrollable) box. */
+.am-legend-controls {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.1rem 0.5rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;   /* let children shrink instead of forcing the column wider than the legend */
+}
+.am-detail { display: flex; gap: 0.2rem; }
+.am-seg {
+  flex: 1 1 0;
+  font-size: 0.64rem;
+  padding: 0.2rem 0.1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.am-seg:hover:not(:disabled) { background: var(--surface-2); }
+.am-seg-on, .am-seg-on:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.am-seg:disabled { opacity: 0.5; cursor: default; }
+.am-control-note { font-size: 0.62rem; color: var(--muted); }
+.am-control-err { color: #b91c1c; }
+.am-dark .am-control-err { color: #fca5a5; }
+
+.am-add { position: relative; min-width: 0; }
+.am-add-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+  justify-content: center;
+  font-size: 0.66rem;
+  padding: 0.22rem 0.45rem;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--fg);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.am-add-toggle:hover:not(:disabled) { background: var(--surface-2); }
+.am-add-toggle:disabled { opacity: 0.5; cursor: default; }
+.am-add-field { position: relative; margin-top: 0.25rem; min-width: 0; }
+.am-add-input {
+  /* Containment guards (!important): a host (Obsidian core / theme, e.g. Minimal)
+     styles `input[type=text]` at 0,1,1 — higher than this class (0,1,0) — with
+     `box-sizing:content-box` + `padding` + `min-width`, which widens the field past
+     the legend. Since the add field open sets `.am-adding` (legend overflow:visible),
+     that overflow then SPILLS visibly to the right. Pin the box so no host rule can
+     grow it: border-box + width:100% + min/max-width. No-op in Claude's iframe. */
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.28rem 0.45rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  border-radius: 6px;
+}
+.am-add-input:focus { outline: none; border-color: var(--accent); }
+/* Results as an absolute overlay so their height never perturbs the measured
+   legend-body cap; capped + scrollable so a long list stays inside the panel. */
+.am-add-results {
+  position: absolute;
+  /* Explicit top/right/bottom/left in one declaration so no host rule can shift the
+     anchor: the panel is pinned to the field's RIGHT edge (never crosses the widget's
+     right edge) and grows LEFT over the model. */
+  inset: 100% 0 auto auto;
+  width: min(320px, 84vw);  /* wider than the legend so long names + notes show fully */
+  z-index: 6;
+  margin: 0.2rem 0 0;       /* also overrides any host <ul> margin */
+  padding: 0.2rem;
+  list-style: none;
+  max-height: 190px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.am-add-results li { margin: 0; padding: 0; }  /* neutralize any host list-item spacing/indent */
+.am-add-result {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  border-radius: 5px;
+}
+.am-add-result:hover { background: var(--surface-2); }
+.am-add-term { font-size: 0.74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.am-add-note {
+  margin-left: auto;
+  font-size: 0.62rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* While the add-structure field is open AND the legend is expanded, let the
+   results dropdown overhang the legend (over the canvas) instead of being clipped:
+   relax the two overflow:hidden ancestors (.am-legend and .am-legend-collapse-inner)
+   ONLY in this state, so the fold's clipping stays intact when collapsed. */
+.am-legend:not(.am-collapsed).am-adding,
+.am-legend:not(.am-collapsed).am-adding .am-legend-collapse-inner {
+  overflow: visible;
+}
+
+.am-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  /* Pin the box (!important): a host `button{min-width}` (Obsidian core/theme) can
+     otherwise grow this fixed control past the legend, and with the add field open
+     (`.am-adding` → legend overflow:visible) it spills visibly right. */
+  box-sizing: border-box !important;
+  width: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  height: 20px;
+  /* Explicit reset: a host's default <button> chrome (notably Obsidian's) adds
+     padding + box-shadow + background; the padding collapses this fixed 20px box
+     and clips the ✕, and the shadow paints an empty "box". Neutralize all of it. */
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 5px;
+  opacity: 0.5;               /* faintly visible at rest so the ✕ is discoverable */
+}
+.am-row:hover .am-remove, .am-remove:focus-visible { opacity: 1; color: var(--fg); }
+.am-remove:hover { background: var(--surface-2); color: var(--fg); }
 
 .am-legend-body {
   flex: 1 1 auto;
@@ -221,7 +405,7 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em;
   color: var(--muted); padding: 0.3rem 0.35rem 0.12rem;
 }
-.am-row { display: flex; align-items: center; gap: 0.3rem; padding: 0.08rem 0.3rem; border-radius: 6px; }
+.am-row { display: flex; align-items: center; gap: 0.3rem; padding: 0.08rem 0.3rem; border-radius: 6px; min-width: 0; }
 .am-row:hover { background: var(--surface-2); }
 .am-row.am-off { opacity: 0.42; }
 .am-row.am-ctx .am-name-en { color: var(--muted); }
@@ -253,6 +437,11 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   justify-content: center;
   width: 30px;
   height: 30px;
+  /* Reset host default <button> padding/appearance so the icon isn't squeezed
+     (keeps this button's intentional box-shadow below). */
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
   color: var(--fg);
   background: var(--panel);
   -webkit-backdrop-filter: blur(8px);
@@ -326,6 +515,12 @@ body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   .am-name { padding: 0.35rem 0.1rem; }
   .am-name-en { font-size: 0.85rem; }
   .am-swatch { width: 12px; height: 12px; }
+
+  /* Bigger controls; the remove ✕ is always visible (no hover on touch). */
+  .am-seg { padding: 0.4rem 0.1rem; font-size: 0.72rem; }
+  .am-add-toggle { padding: 0.4rem 0.5rem; font-size: 0.74rem; }
+  .am-add-input { padding: 0.4rem 0.5rem; font-size: 0.8rem; }
+  .am-remove { opacity: 1; width: 28px !important; min-width: 28px !important; max-width: 28px !important; height: 28px; }
 
   /* Bigger, safe-area-aware recenter button (top-left, opposite the legend). */
   .am-recenter {

@@ -1,22 +1,23 @@
 import type { Part, PartsCatalog, SystemId } from './vendor/types';
 import { getPartIndex } from './catalog.js';
 
-// NOTE: browser (Obsidian-plugin) copy of the anatomed-mcp module. It drops the
-// server's disk-based neighbour loader: the plugin fetches parts-neighbors.json at
-// runtime and seeds it via primeNeighbors(), so this build never reads from disk.
+// Pure, browser-safe neighbour context. The disk-based loader lives in the Node-only
+// assets-node.ts (server); browser hosts (the widget, the Obsidian plugin) fetch
+// parts-neighbors.json at runtime and seed it via primeNeighbors(). Nothing here reads
+// from disk, so region.ts (buildRegion) stays bundleable into the browser widget.
 
-interface Neighbor {
+export interface Neighbor {
   id: string;
   system: SystemId;
   dist: number;
 }
-type NeighborMap = Record<string, Neighbor[]>;
+export type NeighborMap = Record<string, Neighbor[]>;
 
 let cache: NeighborMap | null = null;
 
-/** Seed the neighbour map directly instead of reading it from disk. The plugin
- *  ships parts-neighbors.json as a runtime-fetched asset and primes it here, so
- *  `contextFor` never reads from disk. */
+/** Seed the neighbour map directly instead of reading it from disk. Browser hosts ship
+ *  parts-neighbors.json as a runtime-fetched asset and prime it here; the server primes
+ *  it from disk (assets-node.ts). `contextFor` returns [] until the map is primed. */
 export function primeNeighbors(map: NeighborMap): void {
   cache = map;
 }

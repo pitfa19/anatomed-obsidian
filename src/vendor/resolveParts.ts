@@ -215,7 +215,7 @@ function buildIndex(catalog: PartsCatalog): CatalogIndex {
 
 function preferRight(parts: Part[]): Part {
   for (const p of parts) if (p.side === 'r') return p;
-  return parts[0]!;
+  return parts[0];
 }
 
 /** Run a group predicate against the catalog, side-deduping (one Part per
@@ -301,4 +301,21 @@ export function resolveQueryToParts(
 /** All group alias phrases (for tool docs / discoverability). */
 export function knownGroupAliases(): string[] {
   return Object.keys(GROUP_SPECS);
+}
+
+/** One clean English suggestion per group (deduped by label) for autocomplete UIs.
+ *  GROUP_SPECS is trilingual (English + Croatian + Latin keys) with several groups
+ *  aliased more than once; the `label` is always the English display name and
+ *  lowercase(label) is itself a valid key, so suggesting labels keeps every
+ *  suggestion resolvable while dropping Croatian/Latin/duplicate keys. */
+export function groupAliasSuggestions(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const spec of Object.values(GROUP_SPECS)) {
+    if (!seen.has(spec.label)) {
+      seen.add(spec.label);
+      out.push(spec.label);
+    }
+  }
+  return out;
 }
