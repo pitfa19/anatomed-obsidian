@@ -19,24 +19,6 @@ const ALIASES: Record<string, string> = {
   'pelvic bone': 'Hip bone',
   'pelvic girdle': 'Hip bone',
   'os pelvis': 'Os coxae',
-  zdjelica: 'Hip bone',
-  'zdjelična kost': 'Hip bone',
-  kuk: 'Hip bone',
-  'natkoljenična kost': 'Femur',
-  natkoljenica: 'Femur',
-  'potkoljenična kost': 'Tibia',
-  potkoljenica: 'Tibia',
-  'goljenična kost': 'Tibia',
-  'lisna kost': 'Fibula',
-  iverica: 'Patella',
-  'iverica koljena': 'Patella',
-  lubanja: 'Skull',
-  'palčana kost': 'Radius',
-  'lakatna kost': 'Ulna',
-  'nadlaktična kost': 'Humerus',
-  'ključna kost': 'Clavicle',
-  lopatica: 'Scapula',
-  'prsna kost': 'Sternum',
 };
 
 // ─── Group predicates ────────────────────────────────────────────────────────
@@ -128,57 +110,37 @@ const GROUP_SPECS: Record<string, GroupSpec> = {
   // Foot
   'foot bones': { label: 'Foot bones', match: matchFootBones },
   'bones of foot': { label: 'Foot bones', match: matchFootBones },
-  'kosti stopala': { label: 'Foot bones', match: matchFootBones },
   'ossa pedis': { label: 'Foot bones', match: matchFootBones },
   tarsus: { label: 'Tarsus', match: matchTarsus },
-  'kosti tarsusa': { label: 'Tarsus', match: matchTarsus },
-  'tarsalne kosti': { label: 'Tarsus', match: matchTarsus },
   'ossa tarsi': { label: 'Tarsus', match: matchTarsus },
   metatarsus: { label: 'Metatarsus', match: matchMetatarsus },
-  'metatarzalne kosti': { label: 'Metatarsus', match: matchMetatarsus },
   'ossa metatarsi': { label: 'Metatarsus', match: matchMetatarsus },
   'phalanges of foot': { label: 'Phalanges of foot', match: matchFootPhalanges },
-  'falange stopala': { label: 'Phalanges of foot', match: matchFootPhalanges },
   'phalanges pedis': { label: 'Phalanges of foot', match: matchFootPhalanges },
 
   // Hand
   'hand bones': { label: 'Hand bones', match: matchHandBones },
   'bones of hand': { label: 'Hand bones', match: matchHandBones },
-  'kosti šake': { label: 'Hand bones', match: matchHandBones },
   'ossa manus': { label: 'Hand bones', match: matchHandBones },
   carpus: { label: 'Carpus', match: matchCarpus },
   'carpal bones': { label: 'Carpus', match: matchCarpus },
-  'kosti zapešća': { label: 'Carpus', match: matchCarpus },
-  'karpalne kosti': { label: 'Carpus', match: matchCarpus },
   'ossa carpi': { label: 'Carpus', match: matchCarpus },
   metacarpus: { label: 'Metacarpus', match: matchMetacarpus },
-  'metakarpalne kosti': { label: 'Metacarpus', match: matchMetacarpus },
   'ossa metacarpi': { label: 'Metacarpus', match: matchMetacarpus },
   'phalanges of hand': { label: 'Phalanges of hand', match: matchHandPhalanges },
-  'falange ruke': { label: 'Phalanges of hand', match: matchHandPhalanges },
   'phalanges manus': { label: 'Phalanges of hand', match: matchHandPhalanges },
 
   // Spine
   'cervical spine': { label: 'Cervical spine', match: matchCervical },
-  'vratna kralježnica': { label: 'Cervical spine', match: matchCervical },
-  'vratni kralješci': { label: 'Cervical spine', match: matchCervical },
   'thoracic spine': { label: 'Thoracic spine', match: matchThoracic },
-  'torakalna kralježnica': { label: 'Thoracic spine', match: matchThoracic },
-  'prsni kralješci': { label: 'Thoracic spine', match: matchThoracic },
   'lumbar spine': { label: 'Lumbar spine', match: matchLumbar },
-  'lumbalna kralježnica': { label: 'Lumbar spine', match: matchLumbar },
-  'slabinski kralješci': { label: 'Lumbar spine', match: matchLumbar },
   spine: { label: 'Spine', match: matchSpine },
-  kralježnica: { label: 'Spine', match: matchSpine },
   'columna vertebralis': { label: 'Spine', match: matchSpine },
 
   // Skull
   neurocranium: { label: 'Neurocranium', match: matchNeurocranium },
-  'moždana lubanja': { label: 'Neurocranium', match: matchNeurocranium },
   viscerocranium: { label: 'Viscerocranium', match: matchViscerocranium },
-  splanhnokranij: { label: 'Viscerocranium', match: matchViscerocranium },
   'facial skeleton': { label: 'Viscerocranium', match: matchViscerocranium },
-  'kosti lubanje': { label: 'Skull bones', match: matchSkullBones },
   'skull bones': { label: 'Skull bones', match: matchSkullBones },
   'ossa cranii': { label: 'Skull bones', match: matchSkullBones },
 };
@@ -304,10 +266,10 @@ export function knownGroupAliases(): string[] {
 }
 
 /** One clean English suggestion per group (deduped by label) for autocomplete UIs.
- *  GROUP_SPECS is trilingual (English + Croatian + Latin keys) with several groups
- *  aliased more than once; the `label` is always the English display name and
+ *  GROUP_SPECS is bilingual (English + Latin keys) with several groups aliased
+ *  more than once; the `label` is always the English display name and
  *  lowercase(label) is itself a valid key, so suggesting labels keeps every
- *  suggestion resolvable while dropping Croatian/Latin/duplicate keys. */
+ *  suggestion resolvable while dropping Latin/duplicate keys. */
 export function groupAliasSuggestions(): string[] {
   const seen = new Set<string>();
   const out: string[] = [];
