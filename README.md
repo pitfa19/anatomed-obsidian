@@ -38,7 +38,7 @@ title: Cervical spine
 ```
 ````
 
-- `region:` / `parts:` accept one or more structures (comma-separated), in English, Latin, or Croatian.
+- `region:` / `parts:` accept one or more structures (comma-separated), in English or Latin.
 - `detail:` accepts `isolated` (default), `related`, or `regional` (surrounding structures shown translucent).
 - `title:` sets an optional heading.
 
