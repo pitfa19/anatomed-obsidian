@@ -18,7 +18,11 @@ its note. Click the image to play.
 
 ## Install
 
-**From the community catalogue** (once approved): Settings → Community plugins → **Browse** →
+Anatomed is an **official Obsidian community plugin** you can download directly from within Obsidian.
+
+[![Anatomed 3D Anatomy on the Obsidian community plugins directory](obsidian-community.png)](https://obsidian.md/plugins?id=anatomed)
+
+**From the community catalogue:** Settings → Community plugins → **Browse** →
 search **"Anatomed 3D Anatomy"** → Install → Enable.
 
 **Manually:** download `manifest.json`, `main.js`, and `styles.css` from the
