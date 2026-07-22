@@ -1,11 +1,16 @@
 Anatomed — 3D Anatomy for Obsidian
 Copyright (c) 2026 Fabijan Pitlović
 
-This project is distributed under two licenses:
+This entire project -- its source code, build scripts, and configuration,
+together with the 3D anatomy models and all data derived from them -- is
+licensed under the
 
-  • Software (source code, build scripts, config)        — MIT (see LICENSE)
-  • Anatomy models + derived data (GLBs, catalog JSONs)  — CC BY-SA 4.0
-                                                            (see LICENSE-ASSETS)
+  Creative Commons Attribution-ShareAlike 4.0 International License
+  (CC BY-SA 4.0)   https://creativecommons.org/licenses/by-sa/4.0/
+
+See the LICENSE file for the full legal code. If you redistribute or adapt this
+work, you must give attribution, indicate changes, and license your derivatives
+under CC BY-SA 4.0 (or a compatible license).
 
 --------------------------------------------------------------------------------
 Third-party content and attribution
@@ -13,22 +18,29 @@ Third-party content and attribution
 
 3D ANATOMY MODELS
 The 3D anatomy content is derived from Z-Anatomy, the libre 3D atlas of anatomy,
-by Gauthier Kervyn and Marcin Zielinski — licensed CC BY-SA 4.0.
+by Gauthier Kervyn and Marcin Zielinski -- licensed CC BY-SA 4.0.
   https://www.z-anatomy.com/   |   https://github.com/Z-Anatomy
 
-Z-Anatomy is itself derived from BodyParts3D, © The Database Center for Life
-Science (DBCLS) — licensed CC BY-SA 2.1 Japan.
+Z-Anatomy is itself derived from BodyParts3D, (c) The Database Center for Life
+Science (DBCLS) -- licensed CC BY-SA 2.1 Japan.
   https://dbarchive.biosciencedbc.jp/en/bodyparts3d/
 
 Attribution chain:
   BodyParts3D (DBCLS, CC BY-SA 2.1 JP)
-    → Z-Anatomy (Kervyn & Zielinski, CC BY-SA 4.0)
-      → Anatomed
+    -> Z-Anatomy (Kervyn & Zielinski, CC BY-SA 4.0)
+      -> Anatomed
 
-The models were modified for this project (region subsets extracted, re-exported
-to GLB, meshopt-compressed; catalog + neighbour data generated). See LICENSE-ASSETS.
+Changes made (indicated per CC BY-SA 4.0 section 3(a)(1)(B)): the Z-Anatomy source
+was modified for this project. Region subsets are extracted and shown ("region
+isolation"; no whole body system is rendered); the models were re-exported to
+glTF/GLB and meshopt-compressed for streaming; vessels and nerves were re-exported
+from the Z-Anatomy Startup.blend to preserve their thin curve geometry; and a
+validated catalogue (parts-catalog.json) plus a nearest-neighbour dataset
+(parts-neighbors.json) were generated from the models.
 
 SOFTWARE DEPENDENCIES
 Built on open-source libraries including three.js, React, react-dom, and
 @react-three/fiber / @react-three/drei, bundled with esbuild against the Obsidian
-plugin API — each under its own license (MIT / Apache-2.0 / BSD family).
+plugin API -- each distributed under its own permissive license (MIT / Apache-2.0 /
+BSD family). Those upstream licenses are unaffected by, and are compatible with,
+this project's CC BY-SA 4.0 license.

@@ -63,7 +63,7 @@ no telemetry.
 
 ## Building from source
 
-This repository is self-contained (MIT). The viewer core under `src/` and `widget/` is shared with
+This repository is self-contained (see License below). The viewer core under `src/` and `widget/` is shared with
 the sibling project **[anatomed-mcp](https://github.com/pitfa19/anatomed-mcp)** (which renders the
 same anatomy inline in Claude).
 
@@ -79,8 +79,11 @@ Layout: `main.tsx` (plugin entry) · `src/` (region resolver + catalogue) · `wi
 
 ## License & attribution
 
-- **Software** (this plugin's code): [MIT](LICENSE).
-- **3D anatomy models + derived data**: **CC BY-SA 4.0** (see [`LICENSE-ASSETS`](LICENSE-ASSETS)
-  and [`NOTICE`](NOTICE)). Derived from **[Z-Anatomy](https://www.z-anatomy.com/)** (Kervyn &
-  Zielinski, CC BY-SA 4.0), itself derived from **BodyParts3D** (DBCLS, CC BY-SA 2.1 Japan).
-  Attribution is required.
+The **whole plugin** — its code, the 3D anatomy models, and all data derived from
+them — is licensed under **[CC BY-SA 4.0](LICENSE)** © 2026 Fabijan Pitlović. You may
+use, share, and adapt it (including commercially) provided you give attribution,
+indicate changes, and license derivatives under CC BY-SA 4.0 (or a compatible license).
+
+The anatomy is derived from **[Z-Anatomy](https://www.z-anatomy.com/)** (Kervyn &
+Zielinski, CC BY-SA 4.0), itself derived from **BodyParts3D** (DBCLS, CC BY-SA 2.1
+Japan). See [`NOTICE`](NOTICE) for the full attribution and the changes made.
