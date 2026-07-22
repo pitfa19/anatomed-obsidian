@@ -1,7 +1,9 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, OrthographicCamera, useGLTF } from '@react-three/drei';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { OrbitControls, OrthographicCamera } from '@react-three/drei';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { RegionDetail, RegionPart, RegionPayload, RegionSystemMeta } from '../src/shared';
 import type { PartsCatalog } from '../src/vendor/types';
 import { assembleRegion, cleanName, MAX_REGION_PARTS } from '../src/region';
@@ -477,7 +479,14 @@ interface SystemGroupProps {
 }
 
 function SystemGroup({ url, tint, systemId, parts, visible, onLoaded }: SystemGroupProps) {
-  const { scene: source } = useGLTF(url);
+  // Load with a bare GLTFLoader wired for meshopt only (our GLBs are meshopt-
+  // compressed). We deliberately avoid drei's useGLTF because it always attaches a
+  // DRACOLoader pointing at a Google gstatic CDN + a draco_decoder.wasm module — dead
+  // weight here (no Draco assets) that also trips static reviewers. MeshoptDecoder's
+  // wasm is inlined in the JS, so this adds no external fetch and no .wasm file.
+  const { scene: source } = useLoader(GLTFLoader, url, (loader) => {
+    loader.setMeshoptDecoder(MeshoptDecoder);
+  });
 
   // Re-clone when the focus/context partition changes (a part added, removed, or
   // flipped focus<->context). applyTint's __tinted/__ctxTinted guards never revert
