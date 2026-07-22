@@ -57,9 +57,17 @@ names. **Click a structure** to open (or create) a `[[Structure]]` note.
 
 ## Privacy & network
 
-The 3D model files (GLB), plus a nearest-neighbour dataset used only for `related`/`regional` blocks,
-stream from a public asset host (configurable above). Nothing else leaves your machine; there is
-no telemetry.
+The plugin talks to exactly **one** host: the asset base URL configured in Settings (by default
+the project's public Supabase bucket). It makes only these requests, and only when you render an
+`anatomed` block:
+
+1. **GLB 3D model files** for the systems in that block.
+2. **`parts-neighbors.json`** (the nearest-neighbour dataset), fetched once and only when a block
+   uses `detail: related` or `detail: regional`.
+
+There are **no other network requests**: no third-party CDNs, no analytics, and no telemetry. The
+structure catalogue (`parts-catalog.json`) is bundled with the plugin and needs no network. Models
+are decoded locally with a meshopt decoder (inlined in the plugin); no external decoder is fetched.
 
 ## Building from source
 
