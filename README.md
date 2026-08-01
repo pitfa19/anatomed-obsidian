@@ -1,3 +1,5 @@
+![Anatom3D — Obsidian plugin: explore the human body inside your vault](docs/title.png)
+
 # Anatomed: 3D Anatomy for Obsidian
 
 Embed interactive, **region-isolated 3D anatomy** directly in your notes. Write an `anatomed`
