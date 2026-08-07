@@ -99,6 +99,14 @@ const matchViscerocranium = (p: Part) =>
 const matchSkullBones = (p: Part) =>
   matchNeurocranium(p) || matchViscerocranium(p) || p.name_en === 'Hyoid bone';
 
+const matchSternum = (p: Part) =>
+  p.system === 'skeleton' &&
+  /^(Manubrium of sternum|Body of sternum|Xiphoid process)$/.test(p.name_en);
+
+const matchHeartChambers = (p: Part) =>
+  p.system === 'vessels' &&
+  /^(Right atrium|Left atrium|Right ventricle|Left ventricle)$/.test(p.name_en);
+
 type GroupPredicate = (p: Part) => boolean;
 
 interface GroupSpec {
@@ -143,6 +151,66 @@ const GROUP_SPECS: Record<string, GroupSpec> = {
   'facial skeleton': { label: 'Viscerocranium', match: matchViscerocranium },
   'skull bones': { label: 'Skull bones', match: matchSkullBones },
   'ossa cranii': { label: 'Skull bones', match: matchSkullBones },
+
+  // Source-model composites
+  sternum: { label: 'Sternum', match: matchSternum },
+  'os sternum': { label: 'Sternum', match: matchSternum },
+  heart: { label: 'Heart (four chambers)', match: matchHeartChambers },
+  cor: { label: 'Heart (four chambers)', match: matchHeartChambers },
+  'cardiac chambers': { label: 'Heart (four chambers)', match: matchHeartChambers },
+};
+
+export type ResolutionIssueKind = 'ambiguous' | 'unavailable';
+
+export interface ResolutionIssue {
+  kind: ResolutionIssueKind;
+  message: string;
+  options?: string[];
+}
+
+const QUERY_ISSUES: Record<string, ResolutionIssue> = {
+  'carotid artery': {
+    kind: 'ambiguous',
+    message: 'Specify common, internal, or external carotid artery and a side.',
+    options: [
+      'left common carotid artery',
+      'right common carotid artery',
+      'left internal carotid artery',
+      'right internal carotid artery',
+      'left external carotid artery',
+      'right external carotid artery',
+    ],
+  },
+  'common carotid artery': {
+    kind: 'ambiguous',
+    message: 'Specify left or right common carotid artery.',
+    options: ['left common carotid artery', 'right common carotid artery'],
+  },
+  'internal carotid artery': {
+    kind: 'ambiguous',
+    message: 'Specify left or right internal carotid artery.',
+    options: ['left internal carotid artery', 'right internal carotid artery'],
+  },
+  'external carotid artery': {
+    kind: 'ambiguous',
+    message: 'Specify left or right external carotid artery.',
+    options: ['left external carotid artery', 'right external carotid artery'],
+  },
+  'femoral neck': {
+    kind: 'unavailable',
+    message: 'The atlas has no separately addressable femoral-neck mesh; request the femur instead.',
+    options: ['left femur', 'right femur'],
+  },
+  'neck of femur': {
+    kind: 'unavailable',
+    message: 'The atlas has no separately addressable femoral-neck mesh; request the femur instead.',
+    options: ['left femur', 'right femur'],
+  },
+  'collum femoris': {
+    kind: 'unavailable',
+    message: 'The atlas has no separately addressable femoral-neck mesh; request the femur instead.',
+    options: ['left femur', 'right femur'],
+  },
 };
 
 function buildIndex(catalog: PartsCatalog): CatalogIndex {
@@ -234,6 +302,7 @@ export function resolvePartByQuery(
 export interface ResolvedQuery {
   parts: Part[];
   expanded?: { label: string; count: number };
+  issue?: ResolutionIssue;
 }
 
 /** Resolve a single user-facing query string to one or more catalog parts.
@@ -254,6 +323,9 @@ export function resolveQueryToParts(
       return { parts, expanded: { label: groupSpec.label, count: parts.length } };
     }
   }
+
+  const issue = QUERY_ISSUES[lc];
+  if (issue) return { parts: [], issue };
 
   const single = resolvePartByQuery(catalog, trimmed);
   if (single) return { parts: [single] };

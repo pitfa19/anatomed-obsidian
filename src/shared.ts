@@ -26,6 +26,13 @@ export interface RegionSystemMeta {
   glb: string;
 }
 
+export interface RegionResolutionIssue {
+  query: string;
+  kind: 'ambiguous' | 'unavailable';
+  message: string;
+  options?: string[];
+}
+
 /** The payload the tool returns (as structuredContent) and the widget renders.
  *  It describes a bounded REGION — a specific set of structures — never a whole
  *  system. The widget loads only the systems referenced here and isolates only
@@ -43,6 +50,8 @@ export interface RegionPayload {
   detail: RegionDetail;
   /** Queries that resolved to nothing (surfaced to the user). */
   unmatched: string[];
+  /** Queries intentionally declined before fuzzy matching. */
+  issues?: RegionResolutionIssue[];
   /** Group aliases that expanded (e.g. "cervical spine" → 7 vertebrae). */
   expanded?: { query: string; label: string; count: number }[];
 }

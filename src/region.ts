@@ -45,6 +45,7 @@ export function buildRegion(
   const seen = new Set<string>();
   const unmatched: string[] = [];
   const expanded: NonNullable<RegionPayload['expanded']> = [];
+  const issues: NonNullable<RegionPayload['issues']> = [];
   let truncated = false;
 
   for (const raw of queries) {
@@ -53,6 +54,10 @@ export function buildRegion(
     const resolved = resolveQueryToParts(catalog, query);
     if (!resolved) {
       unmatched.push(query);
+      continue;
+    }
+    if (resolved.issue) {
+      issues.push({ query, ...resolved.issue });
       continue;
     }
     if (resolved.expanded) {
@@ -81,6 +86,7 @@ export function buildRegion(
     title: opts.title,
     unmatched,
     expanded,
+    issues,
   });
 
   const focusCount = payload.parts.filter((p) => !p.context).length;
@@ -94,6 +100,7 @@ export interface AssembleRegionOptions {
   title?: string;
   unmatched?: string[];
   expanded?: RegionPayload['expanded'];
+  issues?: RegionPayload['issues'];
 }
 
 /** Assemble a bounded RegionPayload from ALREADY-RESOLVED focus parts: dedupe + cap the
@@ -167,6 +174,7 @@ export function assembleRegion(
     systems,
     detail,
     unmatched: opts.unmatched ?? [],
+    issues: opts.issues?.length ? opts.issues : undefined,
     expanded: expanded.length ? expanded : undefined,
   };
 }
@@ -205,6 +213,10 @@ function buildSummary(
     lines.push(`Surrounding context (${payload.detail}, shown translucent): ${ctxNames.join(', ')}.`);
   }
   if (payload.unmatched.length) lines.push(`Not found: ${payload.unmatched.join(', ')}.`);
+  for (const issue of payload.issues ?? []) {
+    const prefix = issue.kind === 'ambiguous' ? 'Ambiguous query' : 'Unavailable in this atlas';
+    lines.push(`${prefix}: ${issue.query}. ${issue.message}`);
+  }
   if (truncated) lines.push(`Focus capped at ${MAX_REGION_PARTS} structures.`);
   return lines.join(' ');
 }
