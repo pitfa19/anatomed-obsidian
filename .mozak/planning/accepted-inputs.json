@@ -1,0 +1,53 @@
+{
+  "contract_version": 1,
+  "id": "inputs-local-first-2026-09-21",
+  "accepted_at": "2026-09-21T02:53:40Z",
+  "inputs": [
+    {
+      "id": "input-owner-local-first",
+      "text": "The owner approved making Anatomed local-first, with an approximately 27 MB local anatomy asset set, and approved registration and implementation.",
+      "provenance": {
+        "kind": "human_decision",
+        "decision_id": "decision-local-first-2026-09-21",
+        "actor": "pitfa"
+      }
+    },
+    {
+      "id": "input-test-before-release",
+      "text": "The owner requires the implementation to be installed and tested locally in their Obsidian before any release.",
+      "provenance": {
+        "kind": "human_decision",
+        "decision_id": "decision-local-test-gate-2026-09-21",
+        "actor": "pitfa"
+      }
+    },
+    {
+      "id": "input-cleanup-gate",
+      "text": "Supabase cleanup must happen only after local acceptance and a separate explicit destructive approval.",
+      "provenance": {
+        "kind": "human_decision",
+        "decision_id": "decision-cleanup-gate-2026-09-21",
+        "actor": "pitfa"
+      }
+    },
+    {
+      "id": "input-current-cloud-paths",
+      "text": "The current plugin defaults to the Supabase models bucket for GLBs and parts-neighbors.json, while parts-catalog.json is bundled into main.js.",
+      "provenance": {
+        "kind": "codebase_observation",
+        "observation_id": "observation-cloud-assets-2026-09-21",
+        "repository_revision": "d97bd0e074dd49aa80e3fd016b8094e0356e23e3",
+        "paths": ["main.tsx", "src/catalog.ts", "widget/RegionViewer.tsx"]
+      }
+    },
+    {
+      "id": "input-community-distribution",
+      "text": "Obsidian Community Plugins automatically downloads only main.js, manifest.json, and styles.css from a matching GitHub release, so additional local model files require an explicit install or bootstrap path.",
+      "provenance": {
+        "kind": "human_decision",
+        "decision_id": "decision-distribution-constraint-2026-09-21",
+        "actor": "pitfa"
+      }
+    }
+  ]
+}

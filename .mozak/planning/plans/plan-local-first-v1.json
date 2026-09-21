@@ -1,0 +1,62 @@
+{
+  "contract_version": 1,
+  "id": "plan-local-first",
+  "version": 1,
+  "input_set_id": "inputs-local-first-2026-09-21",
+  "goals": [
+    {
+      "id": "implement-local-assets",
+      "version": 1,
+      "title": "Implement a local-first anatomy asset store with safe remote bootstrap and fallback",
+      "status": "ready",
+      "priority": 1,
+      "input_ids": ["input-owner-local-first", "input-current-cloud-paths", "input-community-distribution"],
+      "recovery_attempts": 0
+    },
+    {
+      "id": "install-and-test-obsidian",
+      "version": 1,
+      "title": "Install the test build into the owner's Obsidian vault and verify the real note workflow",
+      "status": "planned",
+      "priority": 2,
+      "input_ids": ["input-test-before-release"],
+      "recovery_attempts": 0
+    },
+    {
+      "id": "release-after-acceptance",
+      "version": 1,
+      "title": "Prepare a release only after owner acceptance",
+      "status": "planned",
+      "priority": 3,
+      "input_ids": ["input-test-before-release"],
+      "recovery_attempts": 0
+    },
+    {
+      "id": "cleanup-supabase",
+      "version": 1,
+      "title": "Back up and clean redundant Supabase objects after separate destructive approval",
+      "status": "planned",
+      "priority": 4,
+      "input_ids": ["input-cleanup-gate"],
+      "recovery_attempts": 0
+    }
+  ],
+  "dependencies": [
+    {
+      "goal_id": "install-and-test-obsidian",
+      "depends_on_goal_id": "implement-local-assets",
+      "provenance": {"kind": "declared", "input_ids": ["input-test-before-release"]}
+    },
+    {
+      "goal_id": "release-after-acceptance",
+      "depends_on_goal_id": "install-and-test-obsidian",
+      "provenance": {"kind": "declared", "input_ids": ["input-test-before-release"]}
+    },
+    {
+      "goal_id": "cleanup-supabase",
+      "depends_on_goal_id": "release-after-acceptance",
+      "provenance": {"kind": "declared", "input_ids": ["input-cleanup-gate"]}
+    }
+  ],
+  "recovery": {"max_attempts_per_goal": 2, "allowed_failed_transition": "blocked"}
+}

@@ -1,0 +1,9 @@
+version: 1
+framework_contract_version: 1
+project:
+  id: anatomed-obsidian
+  name: "anatomed-obsidian"
+repository:
+  revision: d97bd0e074dd49aa80e3fd016b8094e0356e23e3
+owned_paths:
+  - .mozak
