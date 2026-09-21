@@ -12,6 +12,10 @@ data.json
 /main.js.map
 /styles.css
 
+# Raw local test assets. The deterministic release ZIP is committed instead.
+/assets/glb/
+/assets/parts-neighbors.json
+
 # Demo video sources — the mp4 is attached to the GitHub release; not committed.
 # (Only the poster PNG in docs/ is committed.)
 obsidian-demo.mp4

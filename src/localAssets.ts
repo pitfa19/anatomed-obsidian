@@ -1,16 +1,5 @@
 import { normalizePath, requestUrl, type App, type Plugin } from 'obsidian';
-
-const ASSETS = [
-  ['glb/insertions.glb', 1_383_896],
-  ['glb/joints.glb', 1_140_768],
-  ['glb/muscles.glb', 2_971_584],
-  ['glb/nerves.glb', 5_835_352],
-  ['glb/organs.glb', 1_386_016],
-  ['glb/regions.glb', 752_024],
-  ['glb/skeleton.glb', 1_873_564],
-  ['glb/vessels.glb', 5_692_308],
-  ['parts-neighbors.json', 5_960_668],
-] as const;
+import { ASSETS, ASSET_PACK_URL, decodeAssetPack } from './assetPack';
 
 export const LOCAL_ASSET_BYTES = ASSETS.reduce((total, [, size]) => total + size, 0);
 
@@ -84,6 +73,15 @@ export class LocalAssetStore {
     await this.ensureFolder(this.root);
     await this.ensureFolder(normalizePath(`${this.root}/glb`));
 
+    const missing = await this.missingAssets();
+    if (missing.length > 0) {
+      try {
+        await this.installAssetPack();
+      } catch (error) {
+        console.warn('[anatomed] GitHub asset pack unavailable; using legacy file fallback', error);
+      }
+    }
+
     let completed = 0;
     onProgress?.({ completed, total: ASSETS.length });
     for (const [relative, expectedSize] of ASSETS) {
@@ -106,6 +104,29 @@ export class LocalAssetStore {
     }
 
     return this.localBaseUrl;
+  }
+
+  private async missingAssets(): Promise<string[]> {
+    const missing: string[] = [];
+    for (const [relative, expectedSize] of ASSETS) {
+      const path = normalizePath(`${this.root}/${relative}`);
+      const stat = (await this.app.vault.adapter.exists(path))
+        ? await this.app.vault.adapter.stat(path)
+        : null;
+      if (!stat || stat.size !== expectedSize) missing.push(relative);
+    }
+    return missing;
+  }
+
+  private async installAssetPack(): Promise<void> {
+    const response = await requestUrl({ url: ASSET_PACK_URL });
+    const archive = decodeAssetPack(response.arrayBuffer);
+    for (const [relative] of ASSETS) {
+      await this.app.vault.adapter.writeBinary(
+        normalizePath(`${this.root}/${relative}`),
+        archive[relative].slice().buffer as ArrayBuffer,
+      );
+    }
   }
 
   private async ensureFolder(path: string): Promise<void> {
