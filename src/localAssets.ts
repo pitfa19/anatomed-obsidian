@@ -38,7 +38,15 @@ export class LocalAssetStore {
   }
 
   get localBaseUrl(): string {
-    return this.app.vault.adapter.getResourcePath(this.root).replace(/\/+$/, '');
+    // getResourcePath() is file-oriented and may append a cache-busting query.
+    // Calling it for the directory and then appending `/glb/...` can therefore
+    // produce an invalid URL such as `assets?mtime/glb/skeleton.glb`. Resolve a
+    // real sentinel file, remove its query, then trim the known relative suffix.
+    const suffix = '/glb/skeleton.glb';
+    const sentinel = this.app.vault.adapter
+      .getResourcePath(normalizePath(`${this.root}${suffix}`))
+      .split(/[?#]/, 1)[0];
+    return sentinel.endsWith(suffix) ? sentinel.slice(0, -suffix.length) : sentinel;
   }
 
   async isReady(): Promise<boolean> {
