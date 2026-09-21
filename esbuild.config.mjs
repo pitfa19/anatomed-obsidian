@@ -1,7 +1,7 @@
 // Builds the Anatomed Obsidian plugin: bundles main.tsx -> main.js (CJS for
-// Electron) and scopes+emits styles.css from the widget CSS. The neighbours
-// dataset is NOT bundled — the plugin fetches it at runtime from the asset host
-// (see ensureNeighbors in main.tsx). React/three/drei are bundled from
+// Electron) and scopes+emits styles.css from the widget CSS. The large model and
+// neighbours assets are cached in the plugin directory on first use rather than
+// bundled into main.js. React/three/drei are bundled from
 // devDependencies. Standalone: everything it needs is vendored in this repo.
 import esbuild from 'esbuild';
 import { builtinModules as builtins } from 'node:module';

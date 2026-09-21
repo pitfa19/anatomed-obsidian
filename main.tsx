@@ -20,6 +20,7 @@ import type { PartsCatalog } from './src/vendor/types';
 import RegionViewer from './widget/RegionViewer';
 import { AnatomedSuggest } from './suggest';
 import catalogRaw from './assets/parts-catalog.json';
+import { LOCAL_ASSET_BYTES, LocalAssetStore } from './src/localAssets';
 
 // Bundled, validated catalogue (Z-Anatomy-derived). Drop the ".g" group
 // containers exactly like the server's loadCatalog does.
@@ -35,12 +36,14 @@ const DETAILS: RegionDetail[] = ['isolated', 'related', 'regional'];
 
 interface AnatomedSettings {
   assetBase: string;
+  localAssets: boolean;
   notesFolder: string;
   height: number;
   defaultDetail: RegionDetail;
 }
 const DEFAULT_SETTINGS: AnatomedSettings = {
   assetBase: SUPABASE_ASSETS,
+  localAssets: true,
   notesFolder: '',
   height: 480,
   defaultDetail: 'isolated',
@@ -141,15 +144,45 @@ function spliceLines(data: string, start: number, end: number, replacement: stri
 export default class AnatomedPlugin extends Plugin {
   settings: AnatomedSettings = DEFAULT_SETTINGS;
   private neighborsReady: Promise<void> | null = null;
+  private localAssets!: LocalAssetStore;
+  private activeAssetBase = SUPABASE_ASSETS;
 
   async onload() {
     await this.loadSettings();
+    this.activeAssetBase = this.settings.assetBase;
+    this.localAssets = new LocalAssetStore(this.app, this, () => this.settings.assetBase);
+    if (this.settings.localAssets) void this.prepareLocalAssets(false);
     this.addSettingTab(new AnatomedSettingTab(this.app, this));
     this.registerMarkdownCodeBlockProcessor('anatomed', (source, el, ctx) =>
       this.render(source, el, ctx),
     );
     // Inline autocomplete for structure names inside an ```anatomed``` block.
     this.registerEditorSuggest(new AnatomedSuggest(this.app, CATALOG));
+  }
+
+  async prepareLocalAssets(showNotices = true, forceCheck = false): Promise<boolean> {
+    if (!this.settings.localAssets) {
+      this.activeAssetBase = this.settings.assetBase;
+      return false;
+    }
+    try {
+      const base = await this.localAssets.prepare(
+        ({ completed, total, path }) => {
+          if (showNotices && path && completed === total) {
+            new Notice('Anatomed: local anatomy assets are ready.');
+          }
+        },
+        forceCheck,
+      );
+      this.activeAssetBase = base;
+      this.neighborsReady = null;
+      return true;
+    } catch (error) {
+      console.warn('[anatomed] local asset preparation failed; using remote assets', error);
+      this.activeAssetBase = this.settings.assetBase;
+      if (showNotices) new Notice('Anatomed: local asset download failed. Remote fallback remains active.');
+      return false;
+    }
   }
 
   /** Lazily fetch + prime the neighbours dataset (only needed for related/regional).
@@ -159,7 +192,15 @@ export default class AnatomedPlugin extends Plugin {
   private ensureNeighbors(): Promise<void> {
     if (!this.neighborsReady) {
       this.neighborsReady = (async () => {
-        const url = `${this.settings.assetBase}/parts-neighbors.json`;
+        if (this.activeAssetBase === this.localAssets.localBaseUrl) {
+          primeNeighbors(
+            await this.localAssets.readJson<Parameters<typeof primeNeighbors>[0]>(
+              'parts-neighbors.json',
+            ),
+          );
+          return;
+        }
+        const url = `${this.activeAssetBase}/parts-neighbors.json`;
         const res = await requestUrl({ url });
         // requestUrl().json is typed `any`; type it to primeNeighbors' param.
         primeNeighbors(res.json as Parameters<typeof primeNeighbors>[0]);
@@ -181,6 +222,10 @@ export default class AnatomedPlugin extends Plugin {
       return;
     }
 
+    if (this.settings.localAssets && this.activeAssetBase === this.settings.assetBase) {
+      await this.prepareLocalAssets(false);
+    }
+
     if (cfg.detail !== 'isolated') {
       try {
         await this.ensureNeighbors();
@@ -191,7 +236,7 @@ export default class AnatomedPlugin extends Plugin {
       }
     }
 
-    const { payload } = buildRegion(CATALOG, cfg.queries, this.settings.assetBase, {
+    const { payload } = buildRegion(CATALOG, cfg.queries, this.activeAssetBase, {
       detail: cfg.detail,
       title: cfg.title,
     });
@@ -315,8 +360,28 @@ class AnatomedSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
+      .setName('Keep anatomy assets locally')
+      .setDesc(
+        `Download ${(LOCAL_ASSET_BYTES / 1024 / 1024).toFixed(1)} MB once, then load models from this vault instead of the cloud.`,
+      )
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.localAssets).onChange(async (value) => {
+          this.plugin.settings.localAssets = value;
+          await this.plugin.saveSettings();
+          await this.plugin.prepareLocalAssets(true, true);
+        }),
+      )
+      .addButton((button) =>
+        button.setButtonText('Download / repair').onClick(async () => {
+          button.setDisabled(true);
+          await this.plugin.prepareLocalAssets(true, true);
+          button.setDisabled(false);
+        }),
+      );
+
+    new Setting(containerEl)
       .setName('Asset base URL')
-      .setDesc('Base URL the 3D models (GLB files) are fetched from.')
+      .setDesc('Remote bootstrap and fallback URL. Local files are preferred when enabled.')
       .addText((t) =>
         t
           .setPlaceholder(SUPABASE_ASSETS)
@@ -374,8 +439,13 @@ class AnatomedSettingTab extends PluginSettingTab {
   getSettingDefinitions(): SettingDefinitionItem[] {
     return [
       {
+        name: 'Keep anatomy assets locally',
+        desc: `Download ${(LOCAL_ASSET_BYTES / 1024 / 1024).toFixed(1)} MB once, then load models from this vault instead of the cloud.`,
+        control: { type: 'toggle', key: 'localAssets' },
+      },
+      {
         name: 'Asset base URL',
-        desc: 'Base URL the 3D models (GLB files) are fetched from.',
+        desc: 'Remote bootstrap and fallback URL. Local files are preferred when enabled.',
         control: { type: 'text', key: 'assetBase', placeholder: SUPABASE_ASSETS },
       },
       {
@@ -409,6 +479,9 @@ class AnatomedSettingTab extends PluginSettingTab {
   async setControlValue(key: string, value: unknown): Promise<void> {
     const s = this.plugin.settings;
     switch (key) {
+      case 'localAssets':
+        s.localAssets = Boolean(value);
+        break;
       case 'assetBase':
         s.assetBase = (String(value).trim() || SUPABASE_ASSETS).replace(/\/+$/, '');
         break;
