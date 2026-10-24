@@ -10,7 +10,7 @@ import {
   type RegionSystemMeta,
 } from './shared.js';
 
-/** Hard cap on focus structures. Enforces the product rule: always a bounded
+/** Hard cap on total region structures. Enforces the product rule: always a bounded
  *  REGION, never the whole model. */
 export const MAX_REGION_PARTS = 60;
 
@@ -136,9 +136,16 @@ export function assembleRegion(
   const focusIds = parts.map((p) => p.id);
   const tuning = DETAIL_TUNING[detail];
   if (tuning.perPart > 0 && focusIds.length > 0) {
-    const ctx = contextFor(catalog, focusIds, tuning.perPart, tuning.cap);
+    const remainingCapacity = MAX_REGION_PARTS - parts.length;
+    const ctx = contextFor(
+      catalog,
+      focusIds,
+      tuning.perPart,
+      Math.min(tuning.cap, remainingCapacity),
+    );
     for (const p of ctx) {
       if (seen.has(p.id)) continue;
+      if (parts.length >= MAX_REGION_PARTS) break;
       seen.add(p.id);
       parts.push({
         id: p.id,
@@ -214,7 +221,8 @@ function buildSummary(
   }
   if (payload.unmatched.length) lines.push(`Not found: ${payload.unmatched.join(', ')}.`);
   for (const issue of payload.issues ?? []) {
-    const prefix = issue.kind === 'ambiguous' ? 'Ambiguous query' : 'Unavailable in this atlas';
+    const prefix = issue.kind === 'ambiguous' ? 'Ambiguous query'
+      : issue.kind === 'unsupported' ? 'Unsupported whole-system query' : 'Unavailable in this atlas';
     lines.push(`${prefix}: ${issue.query}. ${issue.message}`);
   }
   if (truncated) lines.push(`Focus capped at ${MAX_REGION_PARTS} structures.`);

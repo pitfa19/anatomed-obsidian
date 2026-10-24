@@ -28,7 +28,7 @@ export interface RegionSystemMeta {
 
 export interface RegionResolutionIssue {
   query: string;
-  kind: 'ambiguous' | 'unavailable';
+  kind: 'ambiguous' | 'unavailable' | 'unsupported';
   message: string;
   options?: string[];
 }

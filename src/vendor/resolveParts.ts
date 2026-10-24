@@ -2,11 +2,13 @@
 // Group-alias + fuzzy resolution. Keep in sync with upstream when the group
 // predicates change. Only the import lines differ from the original.
 import { fuzzyMatchScored } from './fuzzy.js';
+import { CEREBELLUM_IDS, LEGACY_IDS, LEGACY_NAMES } from './aliases.js';
 import type { Part, PartsCatalog } from './types';
 
 interface CatalogIndex {
   terms: string[];
   byTerm: Map<string, Part[]>;
+  byId: Map<string, Part>;
   groupCache: Map<string, Part[]>;
 }
 
@@ -160,7 +162,7 @@ const GROUP_SPECS: Record<string, GroupSpec> = {
   'cardiac chambers': { label: 'Heart (four chambers)', match: matchHeartChambers },
 };
 
-export type ResolutionIssueKind = 'ambiguous' | 'unavailable';
+export type ResolutionIssueKind = 'ambiguous' | 'unavailable' | 'unsupported';
 
 export interface ResolutionIssue {
   kind: ResolutionIssueKind;
@@ -168,6 +170,8 @@ export interface ResolutionIssue {
   options?: string[];
 }
 
+/** Queries that must never enter fuzzy resolution. Ambiguous terms require a
+ *  more specific request; unavailable substructures are declined explicitly. */
 const QUERY_ISSUES: Record<string, ResolutionIssue> = {
   'carotid artery': {
     kind: 'ambiguous',
@@ -234,11 +238,13 @@ function buildIndex(catalog: PartsCatalog): CatalogIndex {
       terms.push(trimmed);
     }
   };
+  const byId = new Map<string, Part>();
   for (const p of catalog.parts) {
+    byId.set(p.id.trim().toLowerCase(), p);
     push(p.name_en, p);
     if (p.name_lat) push(p.name_lat, p);
   }
-  const idx = { terms, byTerm, groupCache: new Map<string, Part[]>() };
+  const idx = { terms, byTerm, byId, groupCache: new Map<string, Part[]>() };
   CATALOG_INDEX.set(catalog, idx);
   return idx;
 }
@@ -250,13 +256,14 @@ function preferRight(parts: Part[]): Part {
 
 /** Run a group predicate against the catalog, side-deduping (one Part per
  *  unique name_en, preferring the right-side mirror). Cached per-catalog. */
-function expandGroup(catalog: PartsCatalog, spec: GroupSpec): Part[] {
+function expandGroup(catalog: PartsCatalog, spec: GroupSpec, side?: 'l' | 'r'): Part[] {
   const idx = buildIndex(catalog);
-  const cached = idx.groupCache.get(spec.label);
+  const key = `${spec.label}:${side ?? ''}`;
+  const cached = idx.groupCache.get(key);
   if (cached) return cached;
   const byName = new Map<string, Part[]>();
   for (const p of catalog.parts) {
-    if (!spec.match(p)) continue;
+    if (!spec.match(p) || (side && partSide(p) !== side)) continue;
     let bucket = byName.get(p.name_en);
     if (!bucket) {
       bucket = [];
@@ -266,37 +273,70 @@ function expandGroup(catalog: PartsCatalog, spec: GroupSpec): Part[] {
   }
   const out: Part[] = [];
   for (const bucket of byName.values()) out.push(preferRight(bucket));
-  idx.groupCache.set(spec.label, out);
+  idx.groupCache.set(key, out);
   return out;
 }
 
+type Side = 'l' | 'r';
+
+function splitSide(query: string): { term: string; side?: Side; conflict?: boolean } {
+  let term = query.trim().toLowerCase();
+  const prefix = /^(left|right)\s+/.exec(term);
+  const suffix = /(?:\.(l|r)|\s+(left|right))$/.exec(term);
+  const start = prefix ? (prefix[1] === 'left' ? 'l' : 'r') : undefined;
+  const end = suffix ? ((suffix[1] ?? suffix[2]) === 'l' || suffix[2] === 'left' ? 'l' : 'r') : undefined;
+  if (suffix) term = term.slice(0, suffix.index).trim();
+  if (prefix) term = term.slice(prefix[0].length).trim();
+  return { term, side: start ?? end, conflict: !!start && !!end && start !== end };
+}
+
+function partSide(part: Part): Side | undefined {
+  return part.side ?? splitSide(part.id).side ?? splitSide(part.name_en).side;
+}
+
+const WHOLE_SYSTEMS = new Set([
+  'organs', 'visceral systems', 'nervous system', 'nerves', 'vascular system',
+  'cardiovascular system', 'vessels', 'skeletal system', 'skeleton',
+  'muscular system', 'muscles', 'lymphoid system', 'lymphatic system',
+  'lymphoid organs', 'whole body', 'all organs', 'all nerves', 'all vessels',
+]);
+
 const FUZZY_THRESHOLD = 0.5;
 
-export function resolvePartByQuery(
-  catalog: PartsCatalog,
-  query: string,
-): Part | null {
-  const trimmed = query.trim();
-  if (!trimmed) return null;
-  const lc = trimmed.toLowerCase();
+function resolveSingle(catalog: PartsCatalog, query: string, term: string, side?: Side): Part | null {
   const idx = buildIndex(catalog);
-
-  const aliased = ALIASES[lc];
-  if (aliased) {
-    const bucket = idx.byTerm.get(aliased.toLowerCase());
-    if (bucket && bucket.length > 0) return preferRight(bucket);
-  }
-
-  const exact = idx.byTerm.get(lc);
-  if (exact && exact.length > 0) return preferRight(exact);
-
-  const scored = fuzzyMatchScored(trimmed, idx.terms, 5);
-  for (const m of scored) {
+  const choose = (bucket?: Part[]) => {
+    const eligible = bucket?.filter((p) => !side || partSide(p) === side);
+    return eligible?.length ? preferRight(eligible) : null;
+  };
+  const raw = idx.byId.get(query.toLowerCase());
+  if (raw && (!side || partSide(raw) === side)) return raw;
+  const legacyId = LEGACY_IDS[query.toLowerCase()];
+  if (legacyId) return idx.byId.get(legacyId.toLowerCase()) ?? null;
+  const fullExact = choose(idx.byTerm.get(query.toLowerCase()));
+  if (fullExact) return fullExact;
+  const fullAlias = LEGACY_NAMES[query.toLowerCase()];
+  if (fullAlias) return choose(idx.byTerm.get(fullAlias.toLowerCase()));
+  const alias = LEGACY_NAMES[term] ?? ALIASES[term];
+  if (alias) return choose(idx.byTerm.get(alias.toLowerCase()));
+  const exactBucket = idx.byTerm.get(term);
+  // A known structure with an unavailable side must not become another structure.
+  if (exactBucket) return choose(exactBucket);
+  // Unknown raw identifiers must not fuzzy-match a different object.
+  if (/\.[lr]$|\.\d{3}$/i.test(query)) return null;
+  const terms = side ? idx.terms.filter((t) => choose(idx.byTerm.get(t.toLowerCase()))) : idx.terms;
+  for (const m of fuzzyMatchScored(term, terms, 5)) {
     if (m.score < FUZZY_THRESHOLD) break;
-    const bucket = idx.byTerm.get(m.term.toLowerCase());
-    if (bucket && bucket.length > 0) return preferRight(bucket);
+    const part = choose(idx.byTerm.get(m.term.toLowerCase()));
+    if (part) return part;
   }
   return null;
+}
+
+/** Single-part callers receive the same safety checks as region callers. */
+export function resolvePartByQuery(catalog: PartsCatalog, query: string): Part | null {
+  const resolved = resolveQueryToParts(catalog, query);
+  return resolved?.parts.length === 1 ? resolved.parts[0] : null;
 }
 
 export interface ResolvedQuery {
@@ -315,26 +355,48 @@ export function resolveQueryToParts(
   const trimmed = query.trim();
   if (!trimmed) return null;
   const lc = trimmed.toLowerCase();
+  const { term, side, conflict } = splitSide(trimmed);
+  // A source identifier is opaque, even when its historical spelling contains
+  // conflicting side markers. The obsolete Cerebellum IDs are composites below.
+  const raw = buildIndex(catalog).byId.get(lc);
+  if (raw && term !== 'cerebellum' && !QUERY_ISSUES[lc] && !WHOLE_SYSTEMS.has(lc)) return { parts: [raw] };
+  if (conflict) return { parts: [], issue: { kind: 'ambiguous', message: 'Conflicting left and right markers. Specify one side.' } };
+  if (WHOLE_SYSTEMS.has(lc) || WHOLE_SYSTEMS.has(term)) {
+    return { parts: [], issue: { kind: 'unsupported', message: 'Whole-system views are not supported. Request a named structure or bounded region, such as kidney, heart, or cervical spine.', options: ['kidney', 'heart', 'cervical spine'] } };
+  }
 
-  const groupSpec = GROUP_SPECS[lc];
+  if (term === 'cerebellum') {
+    const expectedIds = [...CEREBELLUM_IDS].filter((id) => !side || !/\.[lr]$/.test(id) || id.endsWith(`.${side}`));
+    const members = new Map(catalog.parts.filter((p) => p.system === 'nerves'
+      && expectedIds.includes(p.id.trim().toLowerCase())).map((p) => [p.id.trim().toLowerCase(), p]));
+    const parts = expectedIds.flatMap((id) => members.has(id) ? [members.get(id)!] : []);
+    if (parts.length === expectedIds.length) {
+      const label = `${side === 'l' ? 'Left ' : side === 'r' ? 'Right ' : ''}Cerebellum (lobules and vermis)`;
+      return { parts, expanded: { label, count: parts.length } };
+    }
+    return { parts: [], issue: { kind: 'unavailable', message: 'This catalog lacks the cerebellar subdivisions required for the cerebellum composite. Update the anatomy catalog.' } };
+  }
+
+  const groupSpec = GROUP_SPECS[lc] ?? GROUP_SPECS[term];
   if (groupSpec) {
-    const parts = expandGroup(catalog, groupSpec);
+    const parts = expandGroup(catalog, groupSpec, side);
     if (parts.length > 0) {
       return { parts, expanded: { label: groupSpec.label, count: parts.length } };
     }
+    return { parts: [], issue: { kind: 'unavailable', message: 'This catalog has no members of the requested group on that side.' } };
   }
 
-  const issue = QUERY_ISSUES[lc];
+  const issue = QUERY_ISSUES[lc] ?? (term === 'carotid artery' || !side || QUERY_ISSUES[term]?.kind === 'unavailable' ? QUERY_ISSUES[term] : undefined);
   if (issue) return { parts: [], issue };
 
-  const single = resolvePartByQuery(catalog, trimmed);
+  const single = resolveSingle(catalog, trimmed, term, side);
   if (single) return { parts: [single] };
   return null;
 }
 
 /** All group alias phrases (for tool docs / discoverability). */
 export function knownGroupAliases(): string[] {
-  return Object.keys(GROUP_SPECS);
+  return [...Object.keys(GROUP_SPECS), 'cerebellum'];
 }
 
 /** One clean English suggestion per group (deduped by label) for autocomplete UIs.
@@ -344,7 +406,7 @@ export function knownGroupAliases(): string[] {
  *  suggestion resolvable while dropping Latin/duplicate keys. */
 export function groupAliasSuggestions(): string[] {
   const seen = new Set<string>();
-  const out: string[] = [];
+  const out: string[] = ['Cerebellum'];
   for (const spec of Object.values(GROUP_SPECS)) {
     if (!seen.has(spec.label)) {
       seen.add(spec.label);
