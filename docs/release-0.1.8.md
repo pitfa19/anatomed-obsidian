@@ -14,6 +14,7 @@ No install is needed on the prepared workstation. Package scripts are unchanged.
 cd /Users/fabijanpitlovic/Documents/anatomed-obsidian
 node scripts/package-assets.mjs --assets-ready
 node scripts/test-release-plumbing.mjs
+/Users/fabijanpitlovic/Documents/anatomed-mcp/node_modules/.bin/tsx --test test/*.test.ts
 npm run typecheck
 npm run verify:release
 npm run verify:bootstrap

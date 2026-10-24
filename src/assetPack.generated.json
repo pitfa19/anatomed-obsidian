@@ -1,0 +1,116 @@
+{
+  "release": "releases/2026-10-24-v2",
+  "version": "0.1.8",
+  "pack": "anatomed-assets-v2.zip",
+  "bytes": 14399422,
+  "sha256": "ef6a62800dafea9ba10dabb9ac5225bb21b25a5c659c3020cbe0da30f4832d17",
+  "assets": [
+    {
+      "path": "glb/insertions.glb",
+      "bytes": 1383896,
+      "sha256": "a3a33a40eb7d4b34a8957866ba2367ba347392cc5ef70d0456d1b1bd83cb9903"
+    },
+    {
+      "path": "glb/joints.glb",
+      "bytes": 1140768,
+      "sha256": "80938abd84537ef8dfbba4fca099d28a342471a1432226e618eccafe5f15e5f4"
+    },
+    {
+      "path": "glb/lymphoid.glb",
+      "bytes": 2721680,
+      "sha256": "b2fde68e36add21713be6615082692a932da7efb37899078071086c9b1874d77"
+    },
+    {
+      "path": "glb/muscles.glb",
+      "bytes": 6791352,
+      "sha256": "f3e0e6ec42923341bd1fefa37273be732acfb8d5ada026ddf010c1bde5527db0"
+    },
+    {
+      "path": "glb/nerves.glb",
+      "bytes": 5835352,
+      "sha256": "244b6a4fb44391daa2dfd1061b9e876564d80d9fe810731f701f42e19de85274"
+    },
+    {
+      "path": "glb/organs.glb",
+      "bytes": 1776264,
+      "sha256": "a93b7cfb8beaf5e4ea0fb6b79183c638fc584553b822869c260a81cc89e4d061"
+    },
+    {
+      "path": "glb/regions.glb",
+      "bytes": 752024,
+      "sha256": "5c05d2ad171687a36d7ad776c9e0fb11170e7ff64646b10a284d499455ee2404"
+    },
+    {
+      "path": "glb/skeleton.glb",
+      "bytes": 1873564,
+      "sha256": "afb0562864c32503ec4776849df6dbd4a5a77753a1afdd52750c02a596557fa9"
+    },
+    {
+      "path": "glb/vessels.glb",
+      "bytes": 5692308,
+      "sha256": "84a73565dc6df9339a24dfb9820399ccf28e04410833ab1df6d2f4d94a4fbc84"
+    },
+    {
+      "path": "parts-neighbors.json",
+      "bytes": 5966103,
+      "sha256": "71c3e786c9243dae10a6840aaf492086492977403d10aa059755112454e069af"
+    }
+  ],
+  "publicObjects": [
+    {
+      "path": "glb/insertions.glb",
+      "bytes": 1383896,
+      "sha256": "a3a33a40eb7d4b34a8957866ba2367ba347392cc5ef70d0456d1b1bd83cb9903"
+    },
+    {
+      "path": "glb/joints.glb",
+      "bytes": 1140768,
+      "sha256": "80938abd84537ef8dfbba4fca099d28a342471a1432226e618eccafe5f15e5f4"
+    },
+    {
+      "path": "glb/lymphoid.glb",
+      "bytes": 2721680,
+      "sha256": "b2fde68e36add21713be6615082692a932da7efb37899078071086c9b1874d77"
+    },
+    {
+      "path": "glb/muscles.glb",
+      "bytes": 6791352,
+      "sha256": "f3e0e6ec42923341bd1fefa37273be732acfb8d5ada026ddf010c1bde5527db0"
+    },
+    {
+      "path": "glb/nerves.glb",
+      "bytes": 5835352,
+      "sha256": "244b6a4fb44391daa2dfd1061b9e876564d80d9fe810731f701f42e19de85274"
+    },
+    {
+      "path": "glb/organs.glb",
+      "bytes": 1776264,
+      "sha256": "a93b7cfb8beaf5e4ea0fb6b79183c638fc584553b822869c260a81cc89e4d061"
+    },
+    {
+      "path": "glb/regions.glb",
+      "bytes": 752024,
+      "sha256": "5c05d2ad171687a36d7ad776c9e0fb11170e7ff64646b10a284d499455ee2404"
+    },
+    {
+      "path": "glb/skeleton.glb",
+      "bytes": 1873564,
+      "sha256": "afb0562864c32503ec4776849df6dbd4a5a77753a1afdd52750c02a596557fa9"
+    },
+    {
+      "path": "glb/vessels.glb",
+      "bytes": 5692308,
+      "sha256": "84a73565dc6df9339a24dfb9820399ccf28e04410833ab1df6d2f4d94a4fbc84"
+    },
+    {
+      "path": "parts-neighbors.json",
+      "bytes": 5966103,
+      "sha256": "71c3e786c9243dae10a6840aaf492086492977403d10aa059755112454e069af"
+    },
+    {
+      "path": "parts-catalog.json",
+      "bytes": 736586,
+      "sha256": "182a9a45e427b07d2fda97d92fb45f027e13a16678cc39874bd132977bcf4769"
+    }
+  ]
+}
