@@ -77,7 +77,8 @@ export function fitOrthoToBox(
   const ortho = camera as THREE.OrthographicCamera;
   if (!ortho.isOrthographicCamera) return false;
   if (box.isEmpty()) return false;
-  if (viewport.width <= 0 || viewport.height <= 0) return false;
+  if (![...box.min.toArray(), ...box.max.toArray(), viewport.width, viewport.height, margin].every(Number.isFinite)) return false;
+  if (viewport.width <= 0 || viewport.height <= 0 || margin < 1) return false;
 
   const center = box.getCenter(new THREE.Vector3());
   const sizeV = box.getSize(new THREE.Vector3());
@@ -85,18 +86,38 @@ export function fitOrthoToBox(
   ortho.updateMatrixWorld(true);
   const dir = new THREE.Vector3();
   ortho.getWorldDirection(dir);
-  ortho.position.copy(center).addScaledVector(dir, -Math.max(sizeV.length() * 2, 5));
+  // Avoid unstable magnification for point bounds or sub-pixel source helpers.
+  const diameter = Math.max(sizeV.length(), 0.01);
+  const distance = Math.max(diameter * 2, 5);
+  ortho.position.copy(center).addScaledVector(dir, -distance);
   ortho.lookAt(center);
   ortho.updateMatrixWorld(true);
 
   const aspect = viewport.width / viewport.height;
-  const fitWidth = Math.max(sizeV.x, sizeV.y * aspect) * margin;
+  // World X/Y extents are not screen extents after orbiting. Project every
+  // corner into the camera basis, including the formerly ignored Z extent.
+  const projected = new THREE.Box3();
+  for (const x of [box.min.x, box.max.x]) {
+    for (const y of [box.min.y, box.max.y]) {
+      for (const z of [box.min.z, box.max.z]) {
+        projected.expandByPoint(new THREE.Vector3(x, y, z).applyMatrix4(ortho.matrixWorldInverse));
+      }
+    }
+  }
+  const projectedSize = projected.getSize(new THREE.Vector3());
+  // Reserve the bounding sphere in both screen axes. OrbitControls can rotate
+  // without refitting (which would reset user pan/zoom on every interaction).
+  const fitWidth = Math.max(projectedSize.x, projectedSize.y * aspect, diameter, diameter * aspect) * margin;
   const fitHeight = fitWidth / aspect;
   ortho.left = -fitWidth / 2;
   ortho.right = fitWidth / 2;
   ortho.top = fitHeight / 2;
   ortho.bottom = -fitHeight / 2;
   ortho.zoom = 1;
+  const depthPadding = diameter * 0.1;
+  // An extra radius permits the existing target-within-box pan clamp.
+  ortho.near = Math.max(0, Math.min(-projected.max.z, distance - diameter) - depthPadding);
+  ortho.far = Math.max(-projected.min.z, distance + diameter) + depthPadding;
   ortho.updateProjectionMatrix();
 
   const c = controls as { target?: THREE.Vector3; update?: () => void } | null;
@@ -114,9 +135,10 @@ const LINE_MAT = new THREE.MeshBasicMaterial({
   depthWrite: false,
 });
 
-const THIN_THRESHOLDS: Record<SystemId, { maxOverMed: number; medOverMin: number }> = {
+const THIN_THRESHOLDS: Record<SystemId | 'lymphoid', { maxOverMed: number; medOverMin: number }> = {
   nerves: { maxOverMed: 4, medOverMin: 3 },
   vessels: { maxOverMed: 4, medOverMin: 3 },
+  lymphoid: { maxOverMed: 4, medOverMin: 3 },
   insertions: { maxOverMed: 4, medOverMin: 3 },
   skeleton: { maxOverMed: 14, medOverMin: 6 },
   muscles: { maxOverMed: 14, medOverMin: 6 },
@@ -142,7 +164,11 @@ export function applyTint(
     if (o.name.includes('-line') || o.name.includes('-lin')) {
       m.material = LINE_MAT;
     } else {
-      m.material = new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.05 });
+      // Source GLBs include open sheets, not only closed solids. Their absent
+      // material definitions default to front-face culling, making valid fascia
+      // and surface landmarks vanish from the reverse side. Render both faces,
+      // without thickening, moving vertices, or changing their normals.
+      m.material = new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0.05, side: THREE.DoubleSide });
       thinIfElongated(m, systemId);
     }
     m.userData.__tinted = true;
@@ -160,6 +186,7 @@ export function applyTint(
         color,
         roughness: 0.6,
         metalness: 0.05,
+        side: THREE.DoubleSide,
         transparent: true,
         opacity: 0.28,
         depthWrite: false,
@@ -169,9 +196,9 @@ export function applyTint(
   }
 }
 
-function thinIfElongated(m: THREE.Mesh, systemId: SystemId): void {
-  // nerves/vessels ship as real thin curve-tubes; collapsing re-fattens them.
-  if (systemId === 'nerves' || systemId === 'vessels') return;
+function thinIfElongated(m: THREE.Mesh, systemId: SystemId | 'lymphoid'): void {
+  // These systems ship real thin curve-tubes; collapsing re-fattens them.
+  if (systemId === 'nerves' || systemId === 'vessels' || systemId === 'lymphoid') return;
   if (m.geometry.boundingBox === null) m.geometry.computeBoundingBox();
   const b = m.geometry.boundingBox;
   if (!b) return;
