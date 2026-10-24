@@ -51,5 +51,10 @@ test('AABB distance is separation, zero for overlap, stable catalog ties', () =>
   assert.equal(boxDistance([[0, 0, 0], [1, 1, 1]], [[0.5, 0.5, 0.5], [3, 3, 3]]), 0);
   const parts = ['A', 'C', 'B'].map(id => ({ id, system: 'lymphoid' }));
   const geometry = new Map(parts.map(p => [key(p), { bounds: [[0, 0, 0], [1, 1, 1]] }]));
-  assert.deepEqual(buildNeighbors(parts, geometry, 2).A.map(n => n.id), ['C', 'B']);
+  parts.push({ id: 'insertion', system: 'insertions' });
+  geometry.set(key(parts.at(-1)), { bounds: [[0, 0, 0], [1, 1, 1]] });
+  const neighbors = buildNeighbors(parts, geometry, 2);
+  assert.deepEqual(neighbors.A.map(n => n.id), ['C', 'B']);
+  assert.equal(neighbors.insertion, undefined);
+  assert(Object.values(neighbors).flat().every(n => n.system !== 'insertions'));
 });

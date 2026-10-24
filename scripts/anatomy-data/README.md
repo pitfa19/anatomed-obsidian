@@ -34,7 +34,7 @@ Repeat generation against the same inputs for byte-identical JSON outputs. There
 4. Lymphoid evaluated vertices keep the source world matrix and use Blender's standard glTF Y-up conversion: `(x, y, z)` becomes `(x, z, -y)`. No rescale or recenter is applied. All 160 resulting bounds are checked against the enabled source inventory with a 0.01 mm tolerance.
 5. Source-name/bounds candidates outside this approved repair are not automatically imported. Exact named mesh descendants establish structural coverage, not anatomical equivalence. Unresolved source identities remain explicit.
 
-AABB means axis-aligned bounding box around transformed geometry. Neighbors use actual decoded world-space vertex AABBs, the 30 nearest box separations in metres, rounded to six decimals with stable catalog-order ties. These are spatial neighborhood candidates, not claims of anatomical contact or true surface distance. Legacy catalogs could include zero-face helper/profile boxes and stale identities, so the rebuilt neighbor lists intentionally differ.
+AABB means axis-aligned bounding box around transformed geometry. Neighbors use actual decoded world-space vertex AABBs, the 30 nearest box separations in metres, rounded to four decimals with stable catalog-order ties. As in the legacy pipeline, insertions are excluded from both neighbor sources and candidates. These are spatial neighborhood candidates, not claims of anatomical contact or true surface distance. Legacy catalogs could include zero-face helper/profile boxes and stale identities, so the rebuilt neighbor lists intentionally differ.
 
 ## Acceptance results
 
@@ -56,7 +56,7 @@ AABB means axis-aligned bounding box around transformed geometry. Neighbors use 
 - Original catalog decisions: 3,458 retained, 2 whitespace corrections, 64 stale identities omitted, 10 no-surface targets omitted, 6 helper labels omitted. These total all 3,540 original rows. All 160 lymphoid additions have original-source identity links.
 - Source accounting: 3,247 helper/type exclusions, 14 no-surface exclusions, 2,818 exact-name or named-descendant inclusions, **1,105 unresolved historical source identities**. These total all 7,184 original objects. The unresolved count is not a missing-anatomy claim.
 - All eight original GLB hashes match the audit. Maximum new lymphoid world-bound error is `2.9499844567126843e-8` metres.
-- 113,130 neighbor edges are generated and recomputed during standalone validation. All references target valid catalog identities, with no self or duplicate edges.
+- 91,290 neighbor edges are generated and recomputed during standalone validation. All references target valid catalog identities, with no self or duplicate edges.
 - Six focused tests exercise named containers, world transforms, zero-area triangles, nonfinite data, helper/empty targets, and neighbor tie ordering. The full acceptance checker validates the real nine-system dataset, not fixtures.
 
 The data-only checker does not establish visual quality or native-app behavior. Those checks belong to the renderer and coordinator acceptance workflows.

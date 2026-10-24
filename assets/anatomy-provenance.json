@@ -10,7 +10,7 @@
     "geometry": "Eight original GLBs preserved bytewise. Only 160 missing lymphoid objects exported. No bounds-only identity aliases or duplicate source-candidate exports.",
     "identities": "Converted systems use exact source/raw renderable node names. Existing exact display metadata retained, unique trim-only match metadata transferred. No guessed translation.",
     "omissions": "Helper labels and zero-face/no-target catalog rows are explicitly omitted. Unresolved historical source identities are recorded, not declared absent.",
-    "neighbors": "30 nearest decoded world-space vertex AABBs, Euclidean box separation in metres rounded to 6 decimals. Stable catalog-order tie break. This is not anatomical contact or surface distance.",
+    "neighbors": "30 nearest decoded world-space vertex AABBs, Euclidean box separation in metres rounded to 4 decimals. Insertions excluded from sources and candidates, as in the legacy pipeline. Stable catalog-order tie break. This is not anatomical contact or surface distance.",
     "coverage": "Every original source object and every original catalog row has one decision. Exact-name matches are structural evidence, not a claim of anatomical surface equivalence."
   },
   "checks": {
@@ -34,7 +34,7 @@
       "unique-whitespace-identity-corrected": 2
     },
     "catalog_sha256": "eef3b26148145d54c979cb795e941daa4488cf3418c02956c447d5151e8e966e",
-    "neighbors_sha256": "3416dff61e43a831972237c8f425df7259a35631593691abe9d38930c59188d9"
+    "neighbors_sha256": "9ac7ab8a2bd21d6664c954723d5d7fe02418c4cd1c7eeebd2a59a0cadd8dd9a5"
   },
   "files": [
     {

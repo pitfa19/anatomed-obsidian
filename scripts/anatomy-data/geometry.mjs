@@ -84,9 +84,9 @@ export function boxDistance(a, b) {
   return Math.hypot(...[0, 1, 2].map(i => Math.max(0, a[0][i] - b[1][i], b[0][i] - a[1][i])));
 }
 export function buildNeighbors(parts, geometry, limit = 30) {
-  const rows = parts.map((p, index) => ({ ...p, index, bounds: geometry.get(key(p)).bounds }));
+  const rows = parts.filter(p => p.system !== 'insertions').map((p, index) => ({ ...p, index, bounds: geometry.get(key(p)).bounds }));
   return Object.fromEntries(rows.map(p => [p.id, rows.filter(q => q.id !== p.id)
     .map(q => ({ id: q.id, system: q.system, dist: boxDistance(p.bounds, q.bounds), index: q.index }))
     .sort((a, b) => a.dist - b.dist || a.index - b.index).slice(0, limit)
-    .map(({ index, ...q }) => ({ ...q, dist: Number(q.dist.toFixed(6)) }))]));
+    .map(({ index, ...q }) => ({ ...q, dist: Number(q.dist.toFixed(4)) }))]));
 }

@@ -112,7 +112,7 @@ const provenance = { schema_version: 1, source_blend_sha256: exported.source_sha
   policy: { geometry: 'Eight original GLBs preserved bytewise. Only 160 missing lymphoid objects exported. No bounds-only identity aliases or duplicate source-candidate exports.',
     identities: 'Converted systems use exact source/raw renderable node names. Existing exact display metadata retained, unique trim-only match metadata transferred. No guessed translation.',
     omissions: 'Helper labels and zero-face/no-target catalog rows are explicitly omitted. Unresolved historical source identities are recorded, not declared absent.',
-    neighbors: '30 nearest decoded world-space vertex AABBs, Euclidean box separation in metres rounded to 6 decimals. Stable catalog-order tie break. This is not anatomical contact or surface distance.',
+    neighbors: '30 nearest decoded world-space vertex AABBs, Euclidean box separation in metres rounded to 4 decimals. Insertions excluded from sources and candidates, as in the legacy pipeline. Stable catalog-order tie break. This is not anatomical contact or surface distance.',
     coverage: 'Every original source object and every original catalog row has one decision. Exact-name matches are structural evidence, not a claim of anatomical surface equivalence.' },
   checks: { catalog_rows: parts.length, all_targets_positive_finite: true, original_source_objects: sourceDecisions.length,
     original_catalog_rows: decisions.length, unique_catalog_ids: true, max_lymphoid_bounds_error_metres: maxLymphoidBoundsErrorMetres,
