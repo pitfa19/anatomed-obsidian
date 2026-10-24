@@ -3,6 +3,7 @@
 // predicates change. Only the import lines differ from the original.
 import { fuzzyMatchScored } from './fuzzy.js';
 import { CEREBELLUM_IDS, LEGACY_IDS, LEGACY_NAMES } from './aliases.js';
+import { STALE_ID_ALIASES, STALE_ID_UNAVAILABLE } from './staleIds.js';
 import type { Part, PartsCatalog } from './types';
 
 interface CatalogIndex {
@@ -356,6 +357,23 @@ export function resolveQueryToParts(
   if (!trimmed) return null;
   const lc = trimmed.toLowerCase();
   const { term, side, conflict } = splitSide(trimmed);
+  // Audited stale saved references are classified before raw-ID, side parsing
+  // and fuzzy fallback, including the contradictory old testicular artery ID.
+  const replacement = STALE_ID_ALIASES[lc];
+  if (replacement) {
+    const part = buildIndex(catalog).byId.get(replacement.toLowerCase());
+    if (part) return { parts: [part] };
+    return { parts: [], issue: { kind: 'unavailable',
+      message: `This legacy identifier was renamed to ${replacement}, which is missing from this catalog. Update the anatomy catalog.`,
+      options: [replacement] } };
+  }
+  const alternatives = STALE_ID_UNAVAILABLE[lc];
+  if (alternatives) {
+    const available = alternatives.filter((id) => buildIndex(catalog).byId.has(id.toLowerCase()));
+    return { parts: [], issue: { kind: 'unavailable',
+      message: 'This legacy identifier has no verified one-to-one replacement in the current atlas. Its side, granularity, or identity changed. Choose a current named structure explicitly.',
+      options: available.length ? available : undefined } };
+  }
   // A source identifier is opaque, even when its historical spelling contains
   // conflicting side markers. The obsolete Cerebellum IDs are composites below.
   const raw = buildIndex(catalog).byId.get(lc);
