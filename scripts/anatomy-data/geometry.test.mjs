@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadGeometry, boxDistance, buildNeighbors, helper, key } from './geometry.mjs';
+import { appendGlb, parseGlb, encodeGlb, verifyPreservedGeometry } from './append-source-additions.mjs';
 
 function fixture(positions = [0, 0, 0, 1, 0, 0, 0, 1, 0], options = {}) {
   const bin = Buffer.from(new Float32Array(positions).buffer);
@@ -42,6 +43,20 @@ test('helper-only descendants and empty nodes are not selectable geometry', asyn
     assert.equal(m.describe(m.lookup('Anatomical container')).positive, false); m.dispose();
   }
 });
+test('additive GLB merge preserves original buffers and graph while adding exact geometry', async () => {
+  const original = fixture(), parsed = parseGlb(fixture());
+  parsed.json.nodes[0].name = 'New container'; parsed.json.nodes[1].name = 'New anatomy.r';
+  parsed.json.nodes[0].translation = [5, 6, 7];
+  const { bytes, preservation } = appendGlb(original, encodeGlb(parsed.json, parsed.bin));
+  assert(verifyPreservedGeometry(bytes, preservation));
+  assert.deepEqual(parseGlb(bytes).bin.subarray(0, parseGlb(original).bin.length), parseGlb(original).bin);
+  const model = await loadGeometry(bytes);
+  assert.deepEqual(model.describe(model.lookup('Actual surface.l')).bounds, [[2, 3, 4], [3, 4, 4]]);
+  assert.deepEqual(model.describe(model.lookup('New anatomy.r')).bounds, [[5, 6, 7], [6, 7, 7]]);
+  model.dispose();
+  assert.throws(() => appendGlb(original, original), /Duplicate original node/);
+});
+
 test('helper suffixes exclude labels but retain laterality', () => {
   assert(helper('Cardiovascular system.g')); assert(helper('Leader.j'));
   assert(!helper('Median nerve.l')); assert(!helper('Median nerve.r'));
