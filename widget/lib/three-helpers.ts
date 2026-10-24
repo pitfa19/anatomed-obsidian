@@ -86,9 +86,10 @@ export function fitOrthoToBox(
   ortho.updateMatrixWorld(true);
   const dir = new THREE.Vector3();
   ortho.getWorldDirection(dir);
-  // Avoid unstable magnification for point bounds or sub-pixel source helpers.
-  const diameter = Math.max(sizeV.length(), 0.01);
-  const distance = Math.max(diameter * 2, 5);
+  // Scale distance with the object too: a fixed camera-distance floor makes
+  // lookAt's pole adjustment significant for microscopic structures.
+  const diameter = Math.max(sizeV.length(), 1e-6);
+  const distance = diameter * 2;
   ortho.position.copy(center).addScaledVector(dir, -distance);
   ortho.lookAt(center);
   ortho.updateMatrixWorld(true);

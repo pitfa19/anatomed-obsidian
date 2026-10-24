@@ -14,7 +14,7 @@ function contained(camera: THREE.OrthographicCamera, box: THREE.Box3) {
   }
 }
 for (const [width, height] of [[1200, 400], [360, 800]]) {
-  for (const dimensions of [[0.01, 0.1, 100], [100, 0.01, 1], [1, 100, 0.001], [2000, 5000, 3000], [0, 0, 0]]) {
+  for (const dimensions of [[0.01, 0.1, 100], [100, 0.01, 1], [1, 100, 0.001], [2000, 5000, 3000], [0.0001, 0.00001, 0.0001], [0, 0, 0]]) {
     test(`fit and orbit ${width}x${height} dimensions ${dimensions}`, () => {
       const center = new THREE.Vector3(50, -25, 300);
       const half = new THREE.Vector3(...dimensions).multiplyScalar(0.5);
@@ -50,6 +50,17 @@ test('invalid fit inputs do not mutate camera', () => {
   assert.equal(fitOrthoToBox(new THREE.PerspectiveCamera(), null, box, { width: 1, height: 1 }), false);
   assert.equal(fitOrthoToBox(camera, null, box, { width: 1, height: 1 }, 0), false);
   assert.deepEqual(camera.toJSON(), before);
+});
+test('depth range tolerates the existing target-within-bounds pan clamp', () => {
+  const box = new THREE.Box3(new THREE.Vector3(-4, -1, -8), new THREE.Vector3(4, 1, 8));
+  const camera = new THREE.OrthographicCamera();
+  camera.position.set(1, 2, 3); camera.lookAt(0, 0, 0);
+  fitOrthoToBox(camera, null, box, { width: 800, height: 400 });
+  const offset = camera.position.clone();
+  for (const target of corners(box)) {
+    camera.position.copy(target).add(offset); camera.lookAt(target); camera.updateMatrixWorld(true);
+    for (const corner of corners(box)) assert.ok(Math.abs(corner.project(camera).z) < 1);
+  }
 });
 test('open surfaces and context render both faces without geometry deformation', () => {
   for (const context of [false, true]) {
