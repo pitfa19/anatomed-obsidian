@@ -22,3 +22,13 @@ node test/renderer-evidence.mjs <baseline-audit-directory> <new-output>
 This requires the locally installed headless Chrome used by `scripts/model-audit/run-browser.mjs`. Set `AUDIT_CHROME` to override its executable. No packages are installed or remote services used. Exact GLB paths and checksums are recorded by the harness. A selected-case regression is not an exhaustive catalog audit or an Obsidian/MCP-host/device acceptance check.
 
 The camera deliberately reserves a bounding sphere so ordinary rotation cannot clip the fitted selection. This is more conservative than a tight fit of the initial projection, especially for depth-aligned shapes. User pan/zoom remains untouched until an existing refit trigger (selection, viewport resize, or recenter).
+
+## Restored source surfaces
+
+After the 123 reviewed missing surfaces are integrated, decode every actual GLB with the production loader/decoder and run the real tint helper:
+
+```sh
+node test/renderer-source-geometry.mjs <absolute-repository-root> <new-evidence-json>
+```
+
+This checks all 123 restored identities have finite triangle geometry and identical before/after world bounds. Every mesh in all nine systems is checked for scale, world-matrix and world-bounds changes. The only permitted rescaling is the existing 122 intentional insertion markers. It records exact GLB hashes for the checked bytes. Optional final argument `observe` writes diagnostic evidence without enforcing the unchanged-geometry assertions. This is a geometry/transform integration test, not a pixel-render test.
