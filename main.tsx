@@ -21,6 +21,7 @@ import RegionViewer from './widget/RegionViewer';
 import { AnatomedSuggest } from './suggest';
 import catalogRaw from './assets/parts-catalog.json';
 import { LOCAL_ASSET_BYTES, LocalAssetStore } from './src/localAssets';
+import { DEFAULT_ASSET_BASE, migrateAssetBase } from './src/assetPack';
 
 // Bundled, validated catalogue (Z-Anatomy-derived). Drop the ".g" group
 // containers exactly like the server's loadCatalog does.
@@ -29,8 +30,7 @@ const CATALOG: PartsCatalog = (() => {
   return { ...raw, parts: raw.parts.filter((p) => !p.id.endsWith('.g')) };
 })();
 
-const SUPABASE_ASSETS =
-  'https://uafyfwyyqzunabpuftue.supabase.co/storage/v1/object/public/models';
+const SUPABASE_ASSETS = DEFAULT_ASSET_BASE;
 
 const DETAILS: RegionDetail[] = ['isolated', 'related', 'regional'];
 
@@ -329,6 +329,7 @@ export default class AnatomedPlugin extends Plugin {
   async loadSettings() {
     const data = (await this.loadData()) as Partial<AnatomedSettings> | null;
     this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+    this.settings.assetBase = migrateAssetBase(this.settings.assetBase);
   }
   async saveSettings() {
     await this.saveData(this.settings);

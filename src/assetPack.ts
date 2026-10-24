@@ -1,42 +1,47 @@
 import { createHash } from 'node:crypto';
 import { unzipSync } from 'fflate';
+import metadata from './assetPack.generated.json';
 
+export const ASSET_RELEASE = 'releases/2026-10-24-v2';
+export const LEGACY_ASSET_BASE = 'https://uafyfwyyqzunabpuftue.supabase.co/storage/v1/object/public/models';
+export const DEFAULT_ASSET_BASE = `${LEGACY_ASSET_BASE}/${ASSET_RELEASE}`;
 export const ASSET_PACK_URL =
-  'https://github.com/pitfa19/anatomed-obsidian/releases/download/0.1.7/anatomed-assets-v1.zip';
-export const ASSET_PACK_SHA256 =
-  'd4e3662e1d391e8e4ce798fbddcaaa6eba17c6770bc2b0c69ca27609d8a3e9a5';
+  'https://github.com/pitfa19/anatomed-obsidian/releases/download/0.1.8/anatomed-assets-v2.zip';
+export const ASSET_PACK_SHA256 = metadata.sha256;
+export const ASSETS: ReadonlyArray<readonly [string, number, string]> = metadata.assets.map(
+  (asset) => [asset.path, asset.bytes, asset.sha256] as const,
+);
+export type AssetPath = string;
 
-export const ASSETS = [
-  ['glb/insertions.glb', 1_383_896],
-  ['glb/joints.glb', 1_140_768],
-  ['glb/muscles.glb', 2_971_584],
-  ['glb/nerves.glb', 5_835_352],
-  ['glb/organs.glb', 1_386_016],
-  ['glb/regions.glb', 752_024],
-  ['glb/skeleton.glb', 1_873_564],
-  ['glb/vessels.glb', 5_692_308],
-  ['parts-neighbors.json', 5_960_668],
-] as const;
+/** Upgrade only the old built-in default. Deliberate custom/rollback URLs survive. */
+export function migrateAssetBase(base: string): string {
+  return base.replace(/\/+$/, '') === LEGACY_ASSET_BASE ? DEFAULT_ASSET_BASE : base;
+}
 
-export type AssetPath = (typeof ASSETS)[number][0];
+export function assetDigest(input: ArrayBuffer | Uint8Array): string {
+  return createHash('sha256').update(input instanceof Uint8Array ? input : new Uint8Array(input)).digest('hex');
+}
+
+export function assertAsset(relative: string, input: ArrayBuffer | Uint8Array): void {
+  const expected = ASSETS.find(([path]) => path === relative);
+  if (!expected || input.byteLength !== expected[1] || assetDigest(input) !== expected[2]) {
+    throw new Error(`asset content mismatch for ${relative}`);
+  }
+}
 
 export function decodeAssetPack(input: ArrayBuffer | Uint8Array): Record<AssetPath, Uint8Array> {
   const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
-  const digest = createHash('sha256').update(bytes).digest('hex');
-  if (digest !== ASSET_PACK_SHA256) {
+  const digest = assetDigest(bytes);
+  if (metadata.release !== ASSET_RELEASE || !ASSETS.length || digest !== ASSET_PACK_SHA256) {
     throw new Error(`asset pack checksum mismatch: expected ${ASSET_PACK_SHA256}, received ${digest}`);
   }
-
   const archive = unzipSync(bytes);
-  const expected = new Set<string>(ASSETS.map(([relative]) => relative));
+  const expected = new Set(ASSETS.map(([relative]) => relative));
   const extras = Object.keys(archive).filter((relative) => !expected.has(relative));
   if (extras.length > 0) throw new Error(`unexpected asset pack entries: ${extras.join(', ')}`);
-
-  for (const [relative, expectedSize] of ASSETS) {
-    const file = archive[relative];
-    if (!file || file.byteLength !== expectedSize) {
-      throw new Error(`asset pack entry mismatch for ${relative}`);
-    }
+  for (const [relative] of ASSETS) {
+    if (!archive[relative]) throw new Error(`missing asset pack entry: ${relative}`);
+    assertAsset(relative, archive[relative]);
   }
-  return archive as Record<AssetPath, Uint8Array>;
+  return archive;
 }

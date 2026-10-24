@@ -36,6 +36,10 @@ jobs:
           npm run build
           npm run verify:release
           npm run verify:bootstrap
+          node scripts/test-release-plumbing.mjs
+          # Assets must be publicly readable and match the committed checksums
+          # before attestation or creation of the plugin release.
+          node scripts/verify-public-assets.mjs
 
       - name: Attest build provenance
         uses: actions/attest-build-provenance@v2
@@ -44,7 +48,7 @@ jobs:
             main.js
             styles.css
             manifest.json
-            release-assets/anatomed-assets-v1.zip
+            release-assets/anatomed-assets-v2.zip
 
       - name: Create GitHub Release
         env:
@@ -60,4 +64,4 @@ jobs:
           gh release create "$tag" \
             --title "$tag" \
             --notes "Local-first Anatomed release. The plugin downloads and verifies the anatomy asset pack once, then loads it from the user's vault. Assets carry GitHub build-provenance attestations." \
-            main.js manifest.json styles.css release-assets/anatomed-assets-v1.zip
+            main.js manifest.json styles.css release-assets/anatomed-assets-v2.zip
