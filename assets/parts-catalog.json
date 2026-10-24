@@ -4,57 +4,64 @@
       "id": "skeleton",
       "label_en": "Skeleton",
       "label_hr": "Kostur",
-      "glb": "/models/glb/skeleton.glb?v=97f218dc",
+      "glb": "/models/glb/skeleton.glb?v=afb05628",
       "tint": "#e8d8b9"
     },
     {
       "id": "muscles",
       "label_en": "Muscles",
       "label_hr": "Mišići",
-      "glb": "/models/glb/muscles.glb?v=488b4498",
+      "glb": "/models/glb/muscles.glb?v=43cba688",
       "tint": "#b34a4a"
     },
     {
       "id": "nerves",
       "label_en": "Nerves",
       "label_hr": "Živci",
-      "glb": "/models/glb/nerves.glb?v=0714f715",
+      "glb": "/models/glb/nerves.glb?v=244b6a4f",
       "tint": "#e6c84d"
     },
     {
       "id": "vessels",
       "label_en": "Vessels",
       "label_hr": "Krvne žile",
-      "glb": "/models/glb/vessels.glb?v=21ebbc69",
+      "glb": "/models/glb/vessels.glb?v=84a73565",
       "tint": "#a4203c"
     },
     {
       "id": "organs",
       "label_en": "Organs",
       "label_hr": "Organi",
-      "glb": "/models/glb/organs.glb?v=e13fbbf3",
+      "glb": "/models/glb/organs.glb?v=37e751f4",
       "tint": "#d99a9a"
     },
     {
       "id": "joints",
       "label_en": "Joints",
       "label_hr": "Zglobovi",
-      "glb": "/models/glb/joints.glb?v=6a800014",
+      "glb": "/models/glb/joints.glb?v=80938abd",
       "tint": "#c9b48a"
     },
     {
       "id": "insertions",
       "label_en": "Insertions",
       "label_hr": "Hvatišta",
-      "glb": "/models/glb/insertions.glb?v=e216291f",
+      "glb": "/models/glb/insertions.glb?v=a3a33a40",
       "tint": "#7d5a3a"
     },
     {
       "id": "regions",
       "label_en": "Regions",
       "label_hr": "Regije",
-      "glb": "/models/glb/regions.glb?v=342857f6",
+      "glb": "/models/glb/regions.glb?v=5c05d2ad",
       "tint": "#9aa6b3"
+    },
+    {
+      "id": "lymphoid",
+      "label_en": "Lymphoid",
+      "label_hr": "Limfni sustav",
+      "glb": "/models/glb/lymphoid.glb?v=b2fde68e",
+      "tint": "#73b982"
     }
   ],
   "parts": [
@@ -543,18 +550,6 @@
       "name_lat": "Os ethmoideum"
     },
     {
-      "id": "Facet for calcaneonavicular part of bifurcate ligament",
-      "system": "skeleton",
-      "name_en": "Facet for calcaneonavicular part of bifurcate ligament",
-      "name_lat": "Facies art.. partis calcaneonavicularis ligamenti bifurcati"
-    },
-    {
-      "id": "Facet for plantar calcaneonavicular ligament",
-      "system": "skeleton",
-      "name_en": "Facet for plantar calcaneonavicular ligament",
-      "name_lat": "Facies articularis ligamenti calcaneonavicularis plantaris"
-    },
-    {
       "id": "Femur.l",
       "system": "skeleton",
       "name_en": "Femur",
@@ -671,12 +666,6 @@
       "system": "skeleton",
       "name_en": "Frontal bone",
       "name_lat": "Os frontale"
-    },
-    {
-      "id": "Groove for tendon of flexor hallucis longus of calcaneus",
-      "system": "skeleton",
-      "name_en": "Groove for tendon of flexor hallucis longus of calcaneus",
-      "name_lat": "Sulcus tendinis flexoris longi hallucis calcanei"
     },
     {
       "id": "Hamate bone.l",
@@ -1495,12 +1484,6 @@
       "name_en": "Sixth rib",
       "name_lat": "Sexta costa",
       "side": "r"
-    },
-    {
-      "id": "Skeletal system.g",
-      "system": "skeleton",
-      "name_en": "Skeletal system.g",
-      "name_lat": ""
     },
     {
       "id": "Sphenoid bone",
@@ -4116,12 +4099,6 @@
       "side": "r"
     },
     {
-      "id": "Muscular system.g",
-      "system": "muscles",
-      "name_en": "Muscular system.g",
-      "name_lat": ""
-    },
-    {
       "id": "Mylohyoid muscle.l",
       "system": "muscles",
       "name_en": "Mylohyoid muscle",
@@ -5906,17 +5883,17 @@
       "side": "r"
     },
     {
-      "id": " Temporal pole.l",
+      "id": "(Communicating branch of median nerve with ulnar nerve).l",
       "system": "nerves",
-      "name_en": "Temporal pole",
-      "name_lat": "Polus temporalis",
+      "name_en": "(Communicating branch of median nerve with ulnar nerve)",
+      "name_lat": "",
       "side": "l"
     },
     {
-      "id": " Temporal pole.r",
+      "id": "(Communicating branch of median nerve with ulnar nerve).r",
       "system": "nerves",
-      "name_en": "Temporal pole",
-      "name_lat": "Polus temporalis",
+      "name_en": "(Communicating branch of median nerve with ulnar nerve)",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -5948,16 +5925,16 @@
       "side": "r"
     },
     {
-      "id": "Accessory nucleus of oculomotor nucleus.l",
+      "id": "Accessory nucleus of oculomotor nerve.l",
       "system": "nerves",
-      "name_en": "Accessory nucleus of oculomotor nucleus",
+      "name_en": "Accessory nucleus of oculomotor nerve",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Accessory nucleus of oculomotor nucleus.r",
+      "id": "Accessory nucleus of oculomotor nerve.r",
       "system": "nerves",
-      "name_en": "Accessory nucleus of oculomotor nucleus",
+      "name_en": "Accessory nucleus of oculomotor nerve",
       "name_lat": "",
       "side": "r"
     },
@@ -6066,6 +6043,12 @@
       "name_lat": "Commissura anterior"
     },
     {
+      "id": "Anterior corticospinal tract",
+      "system": "nerves",
+      "name_en": "Anterior corticospinal tract",
+      "name_lat": ""
+    },
+    {
       "id": "Anterior cutaneous branches of femoral nerve.l",
       "system": "nerves",
       "name_en": "Anterior cutaneous branches of femoral nerve",
@@ -6136,6 +6119,18 @@
       "side": "r"
     },
     {
+      "id": "Anterior fasciculus proprius",
+      "system": "nerves",
+      "name_en": "Anterior fasciculus proprius",
+      "name_lat": ""
+    },
+    {
+      "id": "Anterior horn of spinal cord",
+      "system": "nerves",
+      "name_en": "Anterior horn of spinal cord",
+      "name_lat": ""
+    },
+    {
       "id": "Anterior interosseous nerve of forearm.l",
       "system": "nerves",
       "name_en": "Anterior interosseous nerve of forearm",
@@ -6164,6 +6159,48 @@
       "side": "r"
     },
     {
+      "id": "Anterior quadrangular lobule.l",
+      "system": "nerves",
+      "name_en": "Anterior quadrangular lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior quadrangular lobule.r",
+      "system": "nerves",
+      "name_en": "Anterior quadrangular lobule",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Anterior root of posterior femoral cutaneous nerve.l",
+      "system": "nerves",
+      "name_en": "Anterior root of posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior root of posterior femoral cutaneous nerve.r",
+      "system": "nerves",
+      "name_en": "Anterior root of posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Anterior root of spinal nerve.l",
+      "system": "nerves",
+      "name_en": "Anterior root of spinal nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior root of spinal nerve.r",
+      "system": "nerves",
+      "name_en": "Anterior root of spinal nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Anterior segment of eyeball.l",
       "system": "nerves",
       "name_en": "Anterior segment of eyeball",
@@ -6178,10 +6215,36 @@
       "side": "r"
     },
     {
-      "id": "Aqueduct of midbrain (Cerebral aqueduct)",
+      "id": "Anterior spinocerebellar tract",
       "system": "nerves",
-      "name_en": "Aqueduct of midbrain (Cerebral aqueduct)",
+      "name_en": "Anterior spinocerebellar tract",
       "name_lat": ""
+    },
+    {
+      "id": "Anterior spinothalamic tract",
+      "system": "nerves",
+      "name_en": "Anterior spinothalamic tract",
+      "name_lat": ""
+    },
+    {
+      "id": "Aqueduct of midbrain",
+      "system": "nerves",
+      "name_en": "Aqueduct of midbrain",
+      "name_lat": ""
+    },
+    {
+      "id": "Auditory tube.l",
+      "system": "nerves",
+      "name_en": "Auditory tube",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Auditory tube.r",
+      "system": "nerves",
+      "name_en": "Auditory tube",
+      "name_lat": "",
+      "side": "r"
     },
     {
       "id": "Axillary nerve.l",
@@ -6195,6 +6258,34 @@
       "system": "nerves",
       "name_en": "Axillary nerve",
       "name_lat": "Nervus axillaris",
+      "side": "r"
+    },
+    {
+      "id": "Base of peduncle.l",
+      "system": "nerves",
+      "name_en": "Base of peduncle",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Base of peduncle.r",
+      "system": "nerves",
+      "name_en": "Base of peduncle",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Biventral lobule.l",
+      "system": "nerves",
+      "name_en": "Biventral lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Biventral lobule.r",
+      "system": "nerves",
+      "name_en": "Biventral lobule",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -6226,6 +6317,12 @@
       "side": "r"
     },
     {
+      "id": "Cauda equina",
+      "system": "nerves",
+      "name_en": "Cauda equina",
+      "name_lat": ""
+    },
+    {
       "id": "Caudate nucleus.l",
       "system": "nerves",
       "name_en": "Caudate nucleus",
@@ -6246,6 +6343,18 @@
       "name_lat": "Canalis centralis"
     },
     {
+      "id": "Central canal'",
+      "system": "nerves",
+      "name_en": "Central canal'",
+      "name_lat": ""
+    },
+    {
+      "id": "Central lobule",
+      "system": "nerves",
+      "name_en": "Central lobule",
+      "name_lat": ""
+    },
+    {
       "id": "Central sulcus.l",
       "system": "nerves",
       "name_en": "Central sulcus",
@@ -6257,20 +6366,6 @@
       "system": "nerves",
       "name_en": "Central sulcus",
       "name_lat": "Sulcus centralis",
-      "side": "r"
-    },
-    {
-      "id": "Cerebellum.l",
-      "system": "nerves",
-      "name_en": "Cerebellum",
-      "name_lat": "Cerebellum",
-      "side": "l"
-    },
-    {
-      "id": "Cerebellum.r",
-      "system": "nerves",
-      "name_en": "Cerebellum",
-      "name_lat": "Cerebellum",
       "side": "r"
     },
     {
@@ -6299,13 +6394,6 @@
       "system": "nerves",
       "name_en": "Choroid plexus",
       "name_lat": "Plexus chorioideus",
-      "side": "r"
-    },
-    {
-      "id": "Ciliary body-curve.r",
-      "system": "nerves",
-      "name_en": "Ciliary body-curve",
-      "name_lat": "",
       "side": "r"
     },
     {
@@ -6496,24 +6584,11 @@
       "name_lat": "Rami digitales plantares communes nervi plantaris medialis"
     },
     {
-      "id": "Common plantar digital branches of medial plantar nerve.001",
+      "id": "Common plantar digital branches of medial plantar nerve.l",
       "system": "nerves",
-      "name_en": "Common plantar digital branches of medial plantar nerve.001",
-      "name_lat": ""
-    },
-    {
-      "id": "Communicating branch of median nerve with ulnar nerve.l",
-      "system": "nerves",
-      "name_en": "Communicating branch of median nerve with ulnar nerve",
+      "name_en": "Common plantar digital branches of medial plantar nerve",
       "name_lat": "",
       "side": "l"
-    },
-    {
-      "id": "Communicating branch of median nerve with ulnar nerve.r",
-      "system": "nerves",
-      "name_en": "Communicating branch of median nerve with ulnar nerve",
-      "name_lat": "",
-      "side": "r"
     },
     {
       "id": "Cornea.l",
@@ -6536,6 +6611,18 @@
       "name_lat": "Corpus callosum"
     },
     {
+      "id": "Culmen",
+      "system": "nerves",
+      "name_en": "Culmen",
+      "name_lat": ""
+    },
+    {
+      "id": "Cuneate fasciculus",
+      "system": "nerves",
+      "name_en": "Cuneate fasciculus",
+      "name_lat": ""
+    },
+    {
       "id": "Cuneus.l",
       "system": "nerves",
       "name_en": "Cuneus",
@@ -6548,6 +6635,12 @@
       "name_en": "Cuneus",
       "name_lat": "Cuneus",
       "side": "r"
+    },
+    {
+      "id": "Declive",
+      "system": "nerves",
+      "name_en": "Declive",
+      "name_lat": ""
     },
     {
       "id": "Deep branch of radial nerve.l",
@@ -6676,19 +6769,6 @@
       "side": "r"
     },
     {
-      "id": "Equator of eyeball.r",
-      "system": "nerves",
-      "name_en": "Equator of eyeball",
-      "name_lat": "Aequator bulbi oculi",
-      "side": "r"
-    },
-    {
-      "id": "External axis of eyeball",
-      "system": "nerves",
-      "name_en": "External axis of eyeball",
-      "name_lat": "Axis externus bulbi oculi"
-    },
-    {
       "id": "Facial nerve (VII).l",
       "system": "nerves",
       "name_en": "Facial nerve (VII)",
@@ -6735,6 +6815,26 @@
       "name_en": "Femoral nerve",
       "name_lat": "Nervus femoralis",
       "side": "r"
+    },
+    {
+      "id": "Flocculus.l",
+      "system": "nerves",
+      "name_en": "Flocculus",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Flocculus.r",
+      "system": "nerves",
+      "name_en": "Flocculus",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Folium of vermis",
+      "system": "nerves",
+      "name_en": "Folium of vermis",
+      "name_lat": ""
     },
     {
       "id": "Fornix.l",
@@ -6827,6 +6927,26 @@
       "side": "r"
     },
     {
+      "id": "Gracile fasciculus",
+      "system": "nerves",
+      "name_en": "Gracile fasciculus",
+      "name_lat": ""
+    },
+    {
+      "id": "Gracile lobule.l",
+      "system": "nerves",
+      "name_en": "Gracile lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Gracile lobule.r",
+      "system": "nerves",
+      "name_en": "Gracile lobule",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Habenula",
       "system": "nerves",
       "name_en": "Habenula",
@@ -6853,25 +6973,24 @@
       "side": "r"
     },
     {
-      "id": "Hypothalamus.r",
+      "id": "Hypoglossal nerve (XII).l",
       "system": "nerves",
-      "name_en": "Hypothalamus",
-      "name_lat": "Hypothalamus",
-      "side": "r"
-    },
-    {
-      "id": "Hyppoglossal nerve (XII).l",
-      "system": "nerves",
-      "name_en": "Hyppoglossal nerve (XII)",
+      "name_en": "Hypoglossal nerve (XII)",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Hyppoglossal nerve (XII).r",
+      "id": "Hypoglossal nerve (XII).r",
       "system": "nerves",
-      "name_en": "Hyppoglossal nerve (XII)",
+      "name_en": "Hypoglossal nerve (XII)",
       "name_lat": "",
       "side": "r"
+    },
+    {
+      "id": "Hypothalamus",
+      "system": "nerves",
+      "name_en": "Hypothalamus",
+      "name_lat": ""
     },
     {
       "id": "Ilio-inguinal nerve.l",
@@ -6986,6 +7105,34 @@
       "side": "r"
     },
     {
+      "id": "Inferior semilunar lobule.l",
+      "system": "nerves",
+      "name_en": "Inferior semilunar lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior semilunar lobule.r",
+      "system": "nerves",
+      "name_en": "Inferior semilunar lobule",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Inferior subscapular nerve.l",
+      "system": "nerves",
+      "name_en": "Inferior subscapular nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior subscapular nerve.r",
+      "system": "nerves",
+      "name_en": "Inferior subscapular nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Inferior temporal gyrus.l",
       "system": "nerves",
       "name_en": "Inferior temporal gyrus",
@@ -7084,11 +7231,16 @@
       "side": "r"
     },
     {
-      "id": "Internal axis of eyeball.r",
+      "id": "Intermediolateral nucleus",
       "system": "nerves",
-      "name_en": "Internal axis of eyeball",
-      "name_lat": "Axis internus bulbi oculi",
-      "side": "r"
+      "name_en": "Intermediolateral nucleus",
+      "name_lat": ""
+    },
+    {
+      "id": "Intermediomedial nucleus",
+      "system": "nerves",
+      "name_en": "Intermediomedial nucleus",
+      "name_lat": ""
     },
     {
       "id": "Interpeduncular fossa.l",
@@ -7231,6 +7383,18 @@
       "side": "r"
     },
     {
+      "id": "Lateral corticospinal tract",
+      "system": "nerves",
+      "name_en": "Lateral corticospinal tract",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral fasciculus proprius",
+      "system": "nerves",
+      "name_en": "Lateral fasciculus proprius",
+      "name_lat": ""
+    },
+    {
       "id": "Lateral femoral cutaneous nerve.l",
       "system": "nerves",
       "name_en": "Lateral femoral cutaneous nerve",
@@ -7257,6 +7421,12 @@
       "name_en": "Lateral geniculate body",
       "name_lat": "Corpus geniculatum laterale",
       "side": "r"
+    },
+    {
+      "id": "Lateral intermediate substance",
+      "system": "nerves",
+      "name_en": "Lateral intermediate substance",
+      "name_lat": ""
     },
     {
       "id": "Lateral occipital gyrus (Middle occipital gyrus*).l",
@@ -7315,6 +7485,18 @@
       "side": "r"
     },
     {
+      "id": "Lateral reticulospinal tract",
+      "system": "nerves",
+      "name_en": "Lateral reticulospinal tract",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral spinothalamic tract",
+      "system": "nerves",
+      "name_en": "Lateral spinothalamic tract",
+      "name_lat": ""
+    },
+    {
       "id": "Lateral ventricle.l",
       "system": "nerves",
       "name_en": "Lateral ventricle",
@@ -7327,6 +7509,12 @@
       "name_en": "Lateral ventricle",
       "name_lat": "Ventriculus lateralis",
       "side": "r"
+    },
+    {
+      "id": "Lateral vestibulospinal tract",
+      "system": "nerves",
+      "name_en": "Lateral vestibulospinal tract",
+      "name_lat": ""
     },
     {
       "id": "Lens.l",
@@ -7385,6 +7573,12 @@
       "side": "r"
     },
     {
+      "id": "Lingula of cerebellum",
+      "system": "nerves",
+      "name_en": "Lingula of cerebellum",
+      "name_lat": ""
+    },
+    {
       "id": "Long thoracic nerve.l",
       "system": "nerves",
       "name_en": "Long thoracic nerve",
@@ -7413,10 +7607,11 @@
       "side": "r"
     },
     {
-      "id": "Mamillary body",
+      "id": "Mamillary body.l",
       "system": "nerves",
       "name_en": "Mamillary body",
-      "name_lat": "Corpus mammillare"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Mamillary body.r",
@@ -7524,6 +7719,20 @@
       "side": "r"
     },
     {
+      "id": "Medial pectoral nerve.l",
+      "system": "nerves",
+      "name_en": "Medial pectoral nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Medial pectoral nerve.r",
+      "system": "nerves",
+      "name_en": "Medial pectoral nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Medial plantar nerve.l",
       "system": "nerves",
       "name_en": "Medial plantar nerve",
@@ -7538,6 +7747,12 @@
       "side": "r"
     },
     {
+      "id": "Medial reticulospinal tract",
+      "system": "nerves",
+      "name_en": "Medial reticulospinal tract",
+      "name_lat": ""
+    },
+    {
       "id": "Medial sural cutaneous nerve.l",
       "system": "nerves",
       "name_en": "Medial sural cutaneous nerve",
@@ -7550,6 +7765,12 @@
       "name_en": "Medial sural cutaneous nerve",
       "name_lat": "Nervus cutaneus medialis surae",
       "side": "r"
+    },
+    {
+      "id": "Medial vestibulospinal tract",
+      "system": "nerves",
+      "name_en": "Medial vestibulospinal tract",
+      "name_lat": ""
     },
     {
       "id": "Median nerve.l",
@@ -7605,13 +7826,6 @@
       "system": "nerves",
       "name_en": "Mental nerve",
       "name_lat": "Nervus mentalis",
-      "side": "r"
-    },
-    {
-      "id": "Meridians of eyeball.r",
-      "system": "nerves",
-      "name_en": "Meridians of eyeball",
-      "name_lat": "Meridiani bulbi oculi",
       "side": "r"
     },
     {
@@ -7811,9 +8025,37 @@
       "side": "r"
     },
     {
-      "id": "Nervous system & Sense organs.g",
+      "id": "Nerve to piriformis muscle.l",
       "system": "nerves",
-      "name_en": "Nervous system & Sense organs.g",
+      "name_en": "Nerve to piriformis muscle",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Nerve to piriformis muscle.r",
+      "system": "nerves",
+      "name_en": "Nerve to piriformis muscle",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Nerve to quadratus femoris muscle.l",
+      "system": "nerves",
+      "name_en": "Nerve to quadratus femoris muscle",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Nerve to quadratus femoris muscle.r",
+      "system": "nerves",
+      "name_en": "Nerve to quadratus femoris muscle",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Nodule of vermis",
+      "system": "nerves",
+      "name_en": "Nodule of vermis",
       "name_lat": ""
     },
     {
@@ -7913,6 +8155,12 @@
       "name_en": "Nucleus of trochlear nerve",
       "name_lat": "Nucleus nervi trochlearis",
       "side": "r"
+    },
+    {
+      "id": "Nucleus proprius",
+      "system": "nerves",
+      "name_en": "Nucleus proprius",
+      "name_lat": ""
     },
     {
       "id": "Obturator nerve.l",
@@ -8027,16 +8275,16 @@
       "side": "r"
     },
     {
-      "id": "Ophtalmic nerve.l",
+      "id": "Ophthalmic nerve.l",
       "system": "nerves",
-      "name_en": "Ophtalmic nerve",
+      "name_en": "Ophthalmic nerve",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Ophtalmic nerve.r",
+      "id": "Ophthalmic nerve.r",
       "system": "nerves",
-      "name_en": "Ophtalmic nerve",
+      "name_en": "Ophthalmic nerve",
       "name_lat": "",
       "side": "r"
     },
@@ -8223,6 +8471,20 @@
       "side": "r"
     },
     {
+      "id": "Peduncle of flocculus.l",
+      "system": "nerves",
+      "name_en": "Peduncle of flocculus",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Peduncle of flocculus.r",
+      "system": "nerves",
+      "name_en": "Peduncle of flocculus",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Pons.l",
       "system": "nerves",
       "name_en": "Pons",
@@ -8397,6 +8659,32 @@
       "side": "r"
     },
     {
+      "id": "Posterior fasciculus proprius",
+      "system": "nerves",
+      "name_en": "Posterior fasciculus proprius",
+      "name_lat": ""
+    },
+    {
+      "id": "Posterior femoral cutaneous nerve.l",
+      "system": "nerves",
+      "name_en": "Posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior femoral cutaneous nerve.r",
+      "system": "nerves",
+      "name_en": "Posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Posterior horn of spinal cord",
+      "system": "nerves",
+      "name_en": "Posterior horn of spinal cord",
+      "name_lat": ""
+    },
+    {
       "id": "Posterior interosseous nerve of forearm.l",
       "system": "nerves",
       "name_en": "Posterior interosseous nerve of forearm",
@@ -8425,6 +8713,48 @@
       "side": "r"
     },
     {
+      "id": "Posterior quadrangular lobule.l",
+      "system": "nerves",
+      "name_en": "Posterior quadrangular lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior quadrangular lobule.r",
+      "system": "nerves",
+      "name_en": "Posterior quadrangular lobule",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Posterior root of posterior femoral cutaneous nerve.l",
+      "system": "nerves",
+      "name_en": "Posterior root of posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior root of posterior femoral cutaneous nerve.r",
+      "system": "nerves",
+      "name_en": "Posterior root of posterior femoral cutaneous nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Posterior root of spinal nerve.l",
+      "system": "nerves",
+      "name_en": "Posterior root of spinal nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior root of spinal nerve.r",
+      "system": "nerves",
+      "name_en": "Posterior root of spinal nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Posterior segment of eyeball.l",
       "system": "nerves",
       "name_en": "Posterior segment of eyeball",
@@ -8437,6 +8767,18 @@
       "name_en": "Posterior segment of eyeball",
       "name_lat": "Segmentum posterius bulbi oculi",
       "side": "r"
+    },
+    {
+      "id": "Posterior spinocerebellar tract",
+      "system": "nerves",
+      "name_en": "Posterior spinocerebellar tract",
+      "name_lat": ""
+    },
+    {
+      "id": "Posterolateral tract",
+      "system": "nerves",
+      "name_en": "Posterolateral tract",
+      "name_lat": ""
     },
     {
       "id": "Precentral gyrus.l",
@@ -8453,20 +8795,6 @@
       "side": "r"
     },
     {
-      "id": "Precentral sulcus (inferior part)*.l",
-      "system": "nerves",
-      "name_en": "Precentral sulcus (inferior part)*",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Precentral sulcus (inferior part)*.r",
-      "system": "nerves",
-      "name_en": "Precentral sulcus (inferior part)*",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
       "id": "Precentral sulcus (Superior part)*.l",
       "system": "nerves",
       "name_en": "Precentral sulcus (Superior part)*",
@@ -8477,6 +8805,20 @@
       "id": "Precentral sulcus (Superior part)*.r",
       "system": "nerves",
       "name_en": "Precentral sulcus (Superior part)*",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Precentral sulcus (inferior part)*.l",
+      "system": "nerves",
+      "name_en": "Precentral sulcus (inferior part)*",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Precentral sulcus (inferior part)*.r",
+      "system": "nerves",
+      "name_en": "Precentral sulcus (inferior part)*",
       "name_lat": "",
       "side": "r"
     },
@@ -8551,6 +8893,20 @@
       "side": "r"
     },
     {
+      "id": "Pudendal nerve.l",
+      "system": "nerves",
+      "name_en": "Pudendal nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Pudendal nerve.r",
+      "system": "nerves",
+      "name_en": "Pudendal nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Putamen.l",
       "system": "nerves",
       "name_en": "Putamen",
@@ -8577,6 +8933,12 @@
       "name_en": "Pyramid of medulla oblongata",
       "name_lat": "Pyramis medullae oblongatae",
       "side": "r"
+    },
+    {
+      "id": "Pyramis of vermis",
+      "system": "nerves",
+      "name_en": "Pyramis of vermis",
+      "name_lat": ""
     },
     {
       "id": "Radial nerve.l",
@@ -8633,6 +8995,12 @@
       "name_en": "Roots of brachial plexus",
       "name_lat": "Radices plexus brachialis",
       "side": "r"
+    },
+    {
+      "id": "Rubrospinal tract",
+      "system": "nerves",
+      "name_en": "Rubrospinal tract",
+      "name_lat": ""
     },
     {
       "id": "Saphenous nerve.l",
@@ -8709,9 +9077,29 @@
       "name_lat": "Dura spinalis"
     },
     {
-      "id": "Spinal dura.001",
+      "id": "Spinal ganglion.l",
       "system": "nerves",
-      "name_en": "Spinal dura.001",
+      "name_en": "Spinal ganglion",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Spinal ganglion.r",
+      "system": "nerves",
+      "name_en": "Spinal ganglion",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Spinal reticular process",
+      "system": "nerves",
+      "name_en": "Spinal reticular process",
+      "name_lat": ""
+    },
+    {
+      "id": "Spinotectal tract",
+      "system": "nerves",
+      "name_en": "Spinotectal tract",
       "name_lat": ""
     },
     {
@@ -8897,6 +9285,20 @@
       "side": "r"
     },
     {
+      "id": "Superior gluteal nerve.l",
+      "system": "nerves",
+      "name_en": "Superior gluteal nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superior gluteal nerve.r",
+      "system": "nerves",
+      "name_en": "Superior gluteal nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Superior lateral brachial cutaneous nerve.l",
       "system": "nerves",
       "name_en": "Superior lateral brachial cutaneous nerve",
@@ -8950,6 +9352,34 @@
       "system": "nerves",
       "name_en": "Superior salivatory nucleus",
       "name_lat": "Nucleus salivatorius superior",
+      "side": "r"
+    },
+    {
+      "id": "Superior semilunar lobule.l",
+      "system": "nerves",
+      "name_en": "Superior semilunar lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superior semilunar lobule.r",
+      "system": "nerves",
+      "name_en": "Superior semilunar lobule",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superior subscapular nerve.l",
+      "system": "nerves",
+      "name_en": "Superior subscapular nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superior subscapular nerve.r",
+      "system": "nerves",
+      "name_en": "Superior subscapular nerve",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -9093,6 +9523,12 @@
       "side": "r"
     },
     {
+      "id": "Tectospinal tract",
+      "system": "nerves",
+      "name_en": "Tectospinal tract",
+      "name_lat": ""
+    },
+    {
       "id": "Temporal plane.l",
       "system": "nerves",
       "name_en": "Temporal plane",
@@ -9104,6 +9540,20 @@
       "system": "nerves",
       "name_en": "Temporal plane",
       "name_lat": "Planum temporale",
+      "side": "r"
+    },
+    {
+      "id": "Temporal pole.l",
+      "system": "nerves",
+      "name_en": "Temporal pole",
+      "name_lat": "Polus temporalis",
+      "side": "l"
+    },
+    {
+      "id": "Temporal pole.r",
+      "system": "nerves",
+      "name_en": "Temporal pole",
+      "name_lat": "Polus temporalis",
       "side": "r"
     },
     {
@@ -9141,6 +9591,20 @@
       "name_lat": "Ventriculus tertius"
     },
     {
+      "id": "Thoracodorsal nerve.l",
+      "system": "nerves",
+      "name_en": "Thoracodorsal nerve",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Thoracodorsal nerve.r",
+      "system": "nerves",
+      "name_en": "Thoracodorsal nerve",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Tibial nerve.l",
       "system": "nerves",
       "name_en": "Tibial nerve",
@@ -9152,6 +9616,20 @@
       "system": "nerves",
       "name_en": "Tibial nerve",
       "name_lat": "Nervus tibialis",
+      "side": "r"
+    },
+    {
+      "id": "Tonsil of cerebellum.l",
+      "system": "nerves",
+      "name_en": "Tonsil of cerebellum",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Tonsil of cerebellum.r",
+      "system": "nerves",
+      "name_en": "Tonsil of cerebellum",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -9239,6 +9717,12 @@
       "side": "r"
     },
     {
+      "id": "Tuber of vermis",
+      "system": "nerves",
+      "name_en": "Tuber of vermis",
+      "name_lat": ""
+    },
+    {
       "id": "Tympanic membrane.l",
       "system": "nerves",
       "name_en": "Tympanic membrane",
@@ -9267,6 +9751,12 @@
       "side": "r"
     },
     {
+      "id": "Uvula of vermis",
+      "system": "nerves",
+      "name_en": "Uvula of vermis",
+      "name_lat": ""
+    },
+    {
       "id": "Vagus nerve (X).l",
       "system": "nerves",
       "name_en": "Vagus nerve (X)",
@@ -9279,12 +9769,6 @@
       "name_en": "Vagus nerve (X)",
       "name_lat": "Nervus vagus (X)",
       "side": "r"
-    },
-    {
-      "id": "Vestibular nerve",
-      "system": "nerves",
-      "name_en": "Vestibular nerve",
-      "name_lat": "Nervus vestibularis"
     },
     {
       "id": "Vestibular nerve.l",
@@ -9357,6 +9841,12 @@
       "side": "r"
     },
     {
+      "id": "White matter of spinal cord",
+      "system": "nerves",
+      "name_en": "White matter of spinal cord",
+      "name_lat": ""
+    },
+    {
       "id": "White matter of telencephalon.l",
       "system": "nerves",
       "name_en": "White matter of telencephalon",
@@ -9371,9 +9861,16 @@
       "side": "r"
     },
     {
-      "id": "Zonular fibers-curve.r",
+      "id": "Wing of central lobule.l",
       "system": "nerves",
-      "name_en": "Zonular fibers-curve",
+      "name_en": "Wing of central lobule",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Wing of central lobule.r",
+      "system": "nerves",
+      "name_en": "Wing of central lobule",
       "name_lat": "",
       "side": "r"
     },
@@ -9392,9 +9889,44 @@
       "side": "r"
     },
     {
-      "id": "?.r",
+      "id": "(Deep branch of transverse cervical artery).l",
       "system": "vessels",
-      "name_en": "?",
+      "name_en": "(Deep branch of transverse cervical artery)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Deep branch of transverse cervical artery).r",
+      "system": "vessels",
+      "name_en": "(Deep branch of transverse cervical artery)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Superficial branch of transverse cervical artery).l",
+      "system": "vessels",
+      "name_en": "(Superficial branch of transverse cervical artery)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Superficial branch of transverse cervical artery).r",
+      "system": "vessels",
+      "name_en": "(Superficial branch of transverse cervical artery)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Ulnar recurrent artery).l",
+      "system": "vessels",
+      "name_en": "(Ulnar recurrent artery)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Ulnar recurrent artery).r",
+      "system": "vessels",
+      "name_en": "(Ulnar recurrent artery)",
       "name_lat": "",
       "side": "r"
     },
@@ -9417,12 +9949,6 @@
       "name_en": "?x",
       "name_lat": "",
       "side": "r"
-    },
-    {
-      "id": "[Right posterolateral branch]",
-      "system": "vessels",
-      "name_en": "[Right posterolateral branch]",
-      "name_lat": ""
     },
     {
       "id": "Abdominal aorta",
@@ -9491,17 +10017,18 @@
       "name_lat": "Arteria segmentalis basalis anterior pulmonis dextri"
     },
     {
-      "id": "Anterior branch of renal artery",
-      "system": "vessels",
-      "name_en": "Anterior branch of renal artery",
-      "name_lat": "Ramus anterior arteriae renalis"
-    },
-    {
       "id": "Anterior branch of renal artery.l",
       "system": "vessels",
       "name_en": "Anterior branch of renal artery",
       "name_lat": "Ramus anterior arteriae renalis",
       "side": "l"
+    },
+    {
+      "id": "Anterior branch of renal artery.r",
+      "system": "vessels",
+      "name_en": "Anterior branch of renal artery",
+      "name_lat": "",
+      "side": "r"
     },
     {
       "id": "Anterior cerebral artery.l",
@@ -9634,9 +10161,9 @@
       "name_lat": "Sinus intercavernosus anterior"
     },
     {
-      "id": "Anterior interventricular artery (Left ant descending artery)",
+      "id": "Anterior interventricular artery",
       "system": "vessels",
-      "name_en": "Anterior interventricular artery (Left ant descending artery)",
+      "name_en": "Anterior interventricular artery",
       "name_lat": ""
     },
     {
@@ -9658,20 +10185,6 @@
       "system": "vessels",
       "name_en": "Anterior papillary muscle of right ventricle",
       "name_lat": ""
-    },
-    {
-      "id": "Anterior parietal artery.l",
-      "system": "vessels",
-      "name_en": "Anterior parietal artery",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Anterior parietal artery.r",
-      "system": "vessels",
-      "name_en": "Anterior parietal artery",
-      "name_lat": "",
-      "side": "r"
     },
     {
       "id": "Anterior segmental artery of left lung",
@@ -9834,20 +10347,6 @@
       "id": "Artery of central sulcus.r",
       "system": "vessels",
       "name_en": "Artery of central sulcus",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
-      "id": "Artery of postcentral sulcus.l",
-      "system": "vessels",
-      "name_en": "Artery of postcentral sulcus",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Artery of postcentral sulcus.r",
-      "system": "vessels",
-      "name_en": "Artery of postcentral sulcus",
       "name_lat": "",
       "side": "r"
     },
@@ -10076,12 +10575,6 @@
       "side": "r"
     },
     {
-      "id": "Cardiovascular system.g",
-      "system": "vessels",
-      "name_en": "Cardiovascular system.g",
-      "name_lat": ""
-    },
-    {
       "id": "Cavernous sinus.l",
       "system": "vessels",
       "name_en": "Cavernous sinus",
@@ -10308,20 +10801,6 @@
       "side": "r"
     },
     {
-      "id": "Deep branch of transverse cervical artery.l",
-      "system": "vessels",
-      "name_en": "Deep branch of transverse cervical artery",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Deep branch of transverse cervical artery.r",
-      "system": "vessels",
-      "name_en": "Deep branch of transverse cervical artery",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
       "id": "Deep cervical artery.l",
       "system": "vessels",
       "name_en": "Deep cervical artery",
@@ -10432,16 +10911,24 @@
       "name_lat": "Ramus descendens arteriae circumflexae lateralis femoris"
     },
     {
-      "id": "Descending branch of lateral circumflex femoral artery.001",
+      "id": "Descending branch of lateral circumflex femoral artery.l",
       "system": "vessels",
-      "name_en": "Descending branch of lateral circumflex femoral artery.001",
-      "name_lat": ""
+      "name_en": "Descending branch of lateral circumflex femoral artery",
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Descending branch of left colic artery",
       "system": "vessels",
       "name_en": "Descending branch of left colic artery",
       "name_lat": "Ramus descendens arteriae colicae sinistrae"
+    },
+    {
+      "id": "Descending palatine artery.l",
+      "system": "vessels",
+      "name_en": "Descending palatine artery",
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Descending palatine artery.r",
@@ -10703,22 +11190,16 @@
       "side": "r"
     },
     {
-      "id": "External pudendal vein.002",
+      "id": "External pudendal veins.l",
       "system": "vessels",
-      "name_en": "External pudendal vein.002",
-      "name_lat": ""
-    },
-    {
-      "id": "External pudendal vein.l",
-      "system": "vessels",
-      "name_en": "External pudendal vein",
+      "name_en": "External pudendal veins",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "External pudendal vein.r",
+      "id": "External pudendal veins.r",
       "system": "vessels",
-      "name_en": "External pudendal vein",
+      "name_en": "External pudendal veins",
       "name_lat": "",
       "side": "r"
     },
@@ -11201,11 +11682,10 @@
       "name_lat": "Arteria phrenica inferior"
     },
     {
-      "id": "Inferior sagittal sinus.l",
+      "id": "Inferior sagittal sinus",
       "system": "vessels",
       "name_en": "Inferior sagittal sinus",
-      "name_lat": "Sinus sagittalis inferior",
-      "side": "l"
+      "name_lat": ""
     },
     {
       "id": "Inferior suprarenal artery.l",
@@ -11262,15 +11742,15 @@
       "name_lat": ""
     },
     {
-      "id": "Inferior vena cava-ab",
+      "id": "Inferior vena cava (abdominal part)",
       "system": "vessels",
-      "name_en": "Inferior vena cava-ab",
+      "name_en": "Inferior vena cava (abdominal part)",
       "name_lat": ""
     },
     {
-      "id": "Inferior vena cava-th",
+      "id": "Inferior vena cava (thoracic part)",
       "system": "vessels",
-      "name_en": "Inferior vena cava-th",
+      "name_en": "Inferior vena cava (thoracic part)",
       "name_lat": ""
     },
     {
@@ -11288,18 +11768,18 @@
       "side": "r"
     },
     {
-      "id": "Insular branches of middle cerebral artery (M2).l",
-      "system": "vessels",
-      "name_en": "Insular branches of middle cerebral artery (M2)",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
       "id": "Insular branches of middle cerebral artery (M2).r",
       "system": "vessels",
       "name_en": "Insular branches of middle cerebral artery (M2)",
       "name_lat": "",
       "side": "r"
+    },
+    {
+      "id": "Insular branches of middle cerebral artery (M2-segment).l",
+      "system": "vessels",
+      "name_en": "Insular branches of middle cerebral artery (M2-segment)",
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Intercapitular veins of foot.l",
@@ -11644,9 +12124,9 @@
       "name_lat": "Vena lateralis pulmonis dextri"
     },
     {
-      "id": "Left ascending lumbal vein",
+      "id": "Left ascending lumbar vein",
       "system": "vessels",
-      "name_en": "Left ascending lumbal vein",
+      "name_en": "Left ascending lumbar vein",
       "name_lat": ""
     },
     {
@@ -11746,11 +12226,10 @@
       "name_lat": "Vena subcostalis sinistra"
     },
     {
-      "id": "Left superior intercostal veins.l",
+      "id": "Left superior intercostal vein",
       "system": "vessels",
-      "name_en": "Left superior intercostal veins",
-      "name_lat": "",
-      "side": "l"
+      "name_en": "Left superior intercostal vein",
+      "name_lat": ""
     },
     {
       "id": "Left superior pulmonary vein",
@@ -11759,9 +12238,15 @@
       "name_lat": "Vena pulmonalis sinistra superior"
     },
     {
-      "id": "Left superior pulmonary vein.001",
+      "id": "Left testicular artery",
       "system": "vessels",
-      "name_en": "Left superior pulmonary vein.001",
+      "name_en": "Left testicular artery",
+      "name_lat": ""
+    },
+    {
+      "id": "Left testicular vein",
+      "system": "vessels",
+      "name_en": "Left testicular vein",
       "name_lat": ""
     },
     {
@@ -11785,6 +12270,12 @@
       "side": "r"
     },
     {
+      "id": "Lingular vein of left lung",
+      "system": "vessels",
+      "name_en": "Lingular vein of left lung",
+      "name_lat": ""
+    },
+    {
       "id": "Long posterior ciliary arteries.l",
       "system": "vessels",
       "name_en": "Long posterior ciliary arteries",
@@ -11799,12 +12290,6 @@
       "side": "r"
     },
     {
-      "id": "Lumbar arteries",
-      "system": "vessels",
-      "name_en": "Lumbar arteries",
-      "name_lat": "Arteriae lumbales"
-    },
-    {
       "id": "Lumbar arteries.l",
       "system": "vessels",
       "name_en": "Lumbar arteries",
@@ -11812,10 +12297,18 @@
       "side": "l"
     },
     {
-      "id": "Lumbar branch of iliolumbar artery",
+      "id": "Lumbar arteries.r",
+      "system": "vessels",
+      "name_en": "Lumbar arteries",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Lumbar branch of iliolumbar artery.l",
       "system": "vessels",
       "name_en": "Lumbar branch of iliolumbar artery",
-      "name_lat": "Ramus lumbalis arteriae iliolumbalis"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Lumbar branch of iliolumbar artery.r",
@@ -12056,11 +12549,17 @@
       "side": "l"
     },
     {
-      "id": "Middle cerebral artery (M3 segment).r",
+      "id": "Middle cerebral artery (M3-segment).r",
       "system": "vessels",
-      "name_en": "Middle cerebral artery (M3 segment)",
+      "name_en": "Middle cerebral artery (M3-segment)",
       "name_lat": "",
       "side": "r"
+    },
+    {
+      "id": "Middle colic artery",
+      "system": "vessels",
+      "name_en": "Middle colic artery",
+      "name_lat": ""
     },
     {
       "id": "Middle colic vein",
@@ -12117,20 +12616,6 @@
       "side": "r"
     },
     {
-      "id": "Middle temporal branch.l",
-      "system": "vessels",
-      "name_en": "Middle temporal branch",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Middle temporal branch.r",
-      "system": "vessels",
-      "name_en": "Middle temporal branch",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
       "id": "Musculophrenic artery.l",
       "system": "vessels",
       "name_en": "Musculophrenic artery",
@@ -12179,6 +12664,20 @@
       "name_lat": ""
     },
     {
+      "id": "Obturator artery.l",
+      "system": "vessels",
+      "name_en": "Obturator artery",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Obturator artery.r",
+      "system": "vessels",
+      "name_en": "Obturator artery",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Occipital artery.l",
       "system": "vessels",
       "name_en": "Occipital artery",
@@ -12193,6 +12692,12 @@
       "side": "r"
     },
     {
+      "id": "Occipital sinus",
+      "system": "vessels",
+      "name_en": "Occipital sinus",
+      "name_lat": ""
+    },
+    {
       "id": "Occipital vein.l",
       "system": "vessels",
       "name_en": "Occipital vein",
@@ -12205,12 +12710,6 @@
       "name_en": "Occipital vein",
       "name_lat": "Vena occipitalis",
       "side": "r"
-    },
-    {
-      "id": "Occiptal sinus",
-      "system": "vessels",
-      "name_en": "Occiptal sinus",
-      "name_lat": ""
     },
     {
       "id": "Ophthalmic artery.l",
@@ -12280,6 +12779,20 @@
       "system": "vessels",
       "name_en": "Palmar metacarpal arteries",
       "name_lat": "Arteriae metacarpeae palmares",
+      "side": "r"
+    },
+    {
+      "id": "Parietal branches of middle cerebral artery.l",
+      "system": "vessels",
+      "name_en": "Parietal branches of middle cerebral artery",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Parietal branches of middle cerebral artery.r",
+      "system": "vessels",
+      "name_en": "Parietal branches of middle cerebral artery",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -12479,6 +12992,20 @@
       "side": "r"
     },
     {
+      "id": "Postcentral arterial branch.l",
+      "system": "vessels",
+      "name_en": "Postcentral arterial branch",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Postcentral arterial branch.r",
+      "system": "vessels",
+      "name_en": "Postcentral arterial branch",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Posterior auricular vein.l",
       "system": "vessels",
       "name_en": "Posterior auricular vein",
@@ -12505,10 +13032,11 @@
       "name_lat": "Arteria segmentalis basalis posterior pulmonis dextri"
     },
     {
-      "id": "Posterior branch of renal artery",
+      "id": "Posterior branch of renal artery.l",
       "system": "vessels",
       "name_en": "Posterior branch of renal artery",
-      "name_lat": "Ramus posterior arteriae renalis"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Posterior branch of renal artery.r",
@@ -12650,10 +13178,11 @@
       "name_lat": "Sinus intercavernosus posterior"
     },
     {
-      "id": "Posterior intercostal arteries",
+      "id": "Posterior intercostal arteries.l",
       "system": "vessels",
       "name_en": "Posterior intercostal arteries",
-      "name_lat": "Arteriae intercostales posteriores"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Posterior intercostal arteries.r",
@@ -12663,16 +13192,16 @@
       "side": "r"
     },
     {
-      "id": "Posterior interosseus artery.l",
+      "id": "Posterior interosseous artery.l",
       "system": "vessels",
-      "name_en": "Posterior interosseus artery",
+      "name_en": "Posterior interosseous artery",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Posterior interosseus artery.r",
+      "id": "Posterior interosseous artery.r",
       "system": "vessels",
-      "name_en": "Posterior interosseus artery",
+      "name_en": "Posterior interosseous artery",
       "name_lat": "",
       "side": "r"
     },
@@ -12909,16 +13438,16 @@
       "side": "r"
     },
     {
-      "id": "Recurrent interosseus artery.l",
+      "id": "Recurrent interosseous artery.l",
       "system": "vessels",
-      "name_en": "Recurrent interosseus artery",
+      "name_en": "Recurrent interosseous artery",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Recurrent interosseus artery.r",
+      "id": "Recurrent interosseous artery.r",
       "system": "vessels",
-      "name_en": "Recurrent interosseus artery",
+      "name_en": "Recurrent interosseous artery",
       "name_lat": "",
       "side": "r"
     },
@@ -12997,6 +13526,12 @@
       "name_lat": "Vena pulmonalis dextra inferior"
     },
     {
+      "id": "Right inferolateral branch of right coronary artery",
+      "system": "vessels",
+      "name_en": "Right inferolateral branch of right coronary artery",
+      "name_lat": ""
+    },
+    {
       "id": "Right pulmonary artery",
       "system": "vessels",
       "name_en": "Right pulmonary artery",
@@ -13039,9 +13574,9 @@
       "name_lat": "Vena subcostalis dextra"
     },
     {
-      "id": "Right superior intercostal veins",
+      "id": "Right superior intercostal vein",
       "system": "vessels",
-      "name_en": "Right superior intercostal veins",
+      "name_en": "Right superior intercostal vein",
       "name_lat": ""
     },
     {
@@ -13057,13 +13592,6 @@
       "name_lat": ""
     },
     {
-      "id": "Right testicular artery.001.l",
-      "system": "vessels",
-      "name_en": "Right testicular artery.001",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
       "id": "Right testicular artery.r",
       "system": "vessels",
       "name_en": "Right testicular artery",
@@ -13075,12 +13603,6 @@
       "system": "vessels",
       "name_en": "Right testicular vein",
       "name_lat": "Vena testicularis dextra"
-    },
-    {
-      "id": "Right testicular vein.001",
-      "system": "vessels",
-      "name_en": "Right testicular vein.001",
-      "name_lat": ""
     },
     {
       "id": "Right ventricle",
@@ -13189,10 +13711,11 @@
       "side": "r"
     },
     {
-      "id": "Spinal branch of iliolumbar artery",
+      "id": "Spinal branch of iliolumbar artery.l",
       "system": "vessels",
       "name_en": "Spinal branch of iliolumbar artery",
-      "name_lat": "Ramus spinalis arteriae iliolumbalis"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Spinal branch of iliolumbar artery.r",
@@ -13220,17 +13743,18 @@
       "name_lat": "Sinus rectus"
     },
     {
-      "id": "Subcostal artery",
-      "system": "vessels",
-      "name_en": "Subcostal artery",
-      "name_lat": "Arteria subcostalis"
-    },
-    {
       "id": "Subcostal artery.l",
       "system": "vessels",
       "name_en": "Subcostal artery",
       "name_lat": "Arteria subcostalis",
       "side": "l"
+    },
+    {
+      "id": "Subcostal artery.r",
+      "system": "vessels",
+      "name_en": "Subcostal artery",
+      "name_lat": "",
+      "side": "r"
     },
     {
       "id": "Submental artery.l",
@@ -13275,10 +13799,11 @@
       "side": "r"
     },
     {
-      "id": "Subscapular vein",
+      "id": "Subscapular vein.l",
       "system": "vessels",
       "name_en": "Subscapular vein",
-      "name_lat": "Vena subscapularis"
+      "name_lat": "",
+      "side": "l"
     },
     {
       "id": "Subscapular vein.r",
@@ -13300,12 +13825,6 @@
       "name_en": "Superficial branch of medial plantar artery",
       "name_lat": "Ramus superficialis arteriae plantaris medialis",
       "side": "r"
-    },
-    {
-      "id": "Superficial branch of transverse cervical artery.001",
-      "system": "vessels",
-      "name_en": "Superficial branch of transverse cervical artery.001",
-      "name_lat": ""
     },
     {
       "id": "Superficial dorsal veins of penis",
@@ -13412,6 +13931,12 @@
       "side": "r"
     },
     {
+      "id": "Superior anorectal artery",
+      "system": "vessels",
+      "name_en": "Superior anorectal artery",
+      "name_lat": ""
+    },
+    {
       "id": "Superior basal vein of left lung",
       "system": "vessels",
       "name_en": "Superior basal vein of left lung",
@@ -13480,16 +14005,16 @@
       "side": "r"
     },
     {
-      "id": "Superior gluteal vein.l",
+      "id": "Superior gluteal veins.l",
       "system": "vessels",
-      "name_en": "Superior gluteal vein",
+      "name_en": "Superior gluteal veins",
       "name_lat": "",
       "side": "l"
     },
     {
-      "id": "Superior gluteal vein.r",
+      "id": "Superior gluteal veins.r",
       "system": "vessels",
-      "name_en": "Superior gluteal vein",
+      "name_en": "Superior gluteal veins",
       "name_lat": "",
       "side": "r"
     },
@@ -13580,18 +14105,18 @@
       "name_lat": ""
     },
     {
-      "id": "Superior ophtalmic vein.r",
-      "system": "vessels",
-      "name_en": "Superior ophtalmic vein",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
       "id": "Superior ophthalmic vein.l",
       "system": "vessels",
       "name_en": "Superior ophthalmic vein",
       "name_lat": "Vena ophthalmica superior",
       "side": "l"
+    },
+    {
+      "id": "Superior ophthalmic vein.r",
+      "system": "vessels",
+      "name_en": "Superior ophthalmic vein",
+      "name_lat": "",
+      "side": "r"
     },
     {
       "id": "Superior petrosal sinus.l",
@@ -13678,20 +14203,6 @@
       "name_lat": "Vena cava superior"
     },
     {
-      "id": "Supra-orbital arter.l",
-      "system": "vessels",
-      "name_en": "Supra-orbital arter",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Supra-orbital arter.r",
-      "system": "vessels",
-      "name_en": "Supra-orbital arter",
-      "name_lat": "",
-      "side": "r"
-    },
-    {
       "id": "Supra-orbital artery.l",
       "system": "vessels",
       "name_en": "Supra-orbital artery",
@@ -13759,6 +14270,20 @@
       "system": "vessels",
       "name_en": "Supreme intercostal artery",
       "name_lat": "Arteria intercostalis suprema",
+      "side": "r"
+    },
+    {
+      "id": "Temporal branches of middle cerebral artery.l",
+      "system": "vessels",
+      "name_en": "Temporal branches of middle cerebral artery",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Temporal branches of middle cerebral artery.r",
+      "system": "vessels",
+      "name_en": "Temporal branches of middle cerebral artery",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -13891,20 +14416,6 @@
       "system": "vessels",
       "name_en": "Ulnar artery",
       "name_lat": "Arteria ulnaris",
-      "side": "r"
-    },
-    {
-      "id": "Ulnar recurrent artery.l",
-      "system": "vessels",
-      "name_en": "Ulnar recurrent artery",
-      "name_lat": "",
-      "side": "l"
-    },
-    {
-      "id": "Ulnar recurrent artery.r",
-      "system": "vessels",
-      "name_en": "Ulnar recurrent artery",
-      "name_lat": "",
       "side": "r"
     },
     {
@@ -14342,12 +14853,6 @@
       "name_lat": "Oesophagus"
     },
     {
-      "id": "Oesophagus-profile",
-      "system": "organs",
-      "name_en": "Oesophagus-profile",
-      "name_lat": ""
-    },
-    {
       "id": "Omental taenia",
       "system": "organs",
       "name_en": "Omental taenia",
@@ -14692,12 +15197,6 @@
       "system": "organs",
       "name_en": "Vermiform appendix",
       "name_lat": "Appendix vermiformis"
-    },
-    {
-      "id": "Visceral systems.g",
-      "system": "organs",
-      "name_en": "Visceral systems.g",
-      "name_lat": ""
     },
     {
       "id": "Acetabular labrum.l",
@@ -23936,12 +24435,6 @@
       "side": "r"
     },
     {
-      "id": "Parts of human body",
-      "system": "regions",
-      "name_en": "Parts of human body",
-      "name_lat": "Partes corporis humani"
-    },
-    {
       "id": "Pectoral region.l",
       "system": "regions",
       "name_en": "Pectoral region",
@@ -24200,12 +24693,6 @@
       "side": "r"
     },
     {
-      "id": "Regions of human body.g",
-      "system": "regions",
-      "name_en": "Regions of human body.g",
-      "name_lat": ""
-    },
-    {
       "id": "Sacral region.l",
       "system": "regions",
       "name_en": "Sacral region",
@@ -24441,6 +24928,1074 @@
       "system": "regions",
       "name_en": "Zygomatic region",
       "name_lat": "Regio zygomatica",
+      "side": "r"
+    },
+    {
+      "id": "(Anterior tibial node).l",
+      "system": "lymphoid",
+      "name_en": "(Anterior tibial node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Anterior tibial node).r",
+      "system": "lymphoid",
+      "name_en": "(Anterior tibial node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Fibular node).l",
+      "system": "lymphoid",
+      "name_en": "(Fibular node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Fibular node).r",
+      "system": "lymphoid",
+      "name_en": "(Fibular node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Intermediate deep inguinal node).l",
+      "system": "lymphoid",
+      "name_en": "(Intermediate deep inguinal node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Intermediate deep inguinal node).r",
+      "system": "lymphoid",
+      "name_en": "(Intermediate deep inguinal node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Intermediate lacunar node).l",
+      "system": "lymphoid",
+      "name_en": "(Intermediate lacunar node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Intermediate lacunar node).r",
+      "system": "lymphoid",
+      "name_en": "(Intermediate lacunar node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Lateral lacunar node).l",
+      "system": "lymphoid",
+      "name_en": "(Lateral lacunar node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Lateral lacunar node).r",
+      "system": "lymphoid",
+      "name_en": "(Lateral lacunar node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Medial lacunar node).l",
+      "system": "lymphoid",
+      "name_en": "(Medial lacunar node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Medial lacunar node).r",
+      "system": "lymphoid",
+      "name_en": "(Medial lacunar node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Posterior tibial node).l",
+      "system": "lymphoid",
+      "name_en": "(Posterior tibial node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Posterior tibial node).r",
+      "system": "lymphoid",
+      "name_en": "(Posterior tibial node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Proximal deep inguinal node).l",
+      "system": "lymphoid",
+      "name_en": "(Proximal deep inguinal node)",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "(Proximal deep inguinal node).r",
+      "system": "lymphoid",
+      "name_en": "(Proximal deep inguinal node)",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "(Retropyloric nodes)",
+      "system": "lymphoid",
+      "name_en": "(Retropyloric nodes)",
+      "name_lat": ""
+    },
+    {
+      "id": "(Subpyloric nodes)",
+      "system": "lymphoid",
+      "name_en": "(Subpyloric nodes)",
+      "name_lat": ""
+    },
+    {
+      "id": "(Suprapyloric node)",
+      "system": "lymphoid",
+      "name_en": "(Suprapyloric node)",
+      "name_lat": ""
+    },
+    {
+      "id": "Anterior axillary nodes.l",
+      "system": "lymphoid",
+      "name_en": "Anterior axillary nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior axillary nodes.r",
+      "system": "lymphoid",
+      "name_en": "Anterior axillary nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Anterior inferior jugular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Anterior inferior jugular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior inferior jugular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Anterior inferior jugular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Apical axillary nodes.l",
+      "system": "lymphoid",
+      "name_en": "Apical axillary nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Apical axillary nodes.r",
+      "system": "lymphoid",
+      "name_en": "Apical axillary nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Appendicular nodes",
+      "system": "lymphoid",
+      "name_en": "Appendicular nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Brachial nodes.l",
+      "system": "lymphoid",
+      "name_en": "Brachial nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Brachial nodes.r",
+      "system": "lymphoid",
+      "name_en": "Brachial nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Brachiocephalic nodes",
+      "system": "lymphoid",
+      "name_en": "Brachiocephalic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Bucinator node.l",
+      "system": "lymphoid",
+      "name_en": "Bucinator node",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Bucinator node.r",
+      "system": "lymphoid",
+      "name_en": "Bucinator node",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Central axillary nodes.l",
+      "system": "lymphoid",
+      "name_en": "Central axillary nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Central axillary nodes.r",
+      "system": "lymphoid",
+      "name_en": "Central axillary nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Central superior mesenteric nodes",
+      "system": "lymphoid",
+      "name_en": "Central superior mesenteric nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Coeliac nodes",
+      "system": "lymphoid",
+      "name_en": "Coeliac nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Cubital nodes.l",
+      "system": "lymphoid",
+      "name_en": "Cubital nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Cubital nodes.r",
+      "system": "lymphoid",
+      "name_en": "Cubital nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Cystic node",
+      "system": "lymphoid",
+      "name_en": "Cystic node",
+      "name_lat": ""
+    },
+    {
+      "id": "Deep popliteal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Deep popliteal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Deep popliteal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Deep popliteal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Ileocolic nodes",
+      "system": "lymphoid",
+      "name_en": "Ileocolic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Inferior deep lateral cervical nodes.l",
+      "system": "lymphoid",
+      "name_en": "Inferior deep lateral cervical nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior deep lateral cervical nodes.r",
+      "system": "lymphoid",
+      "name_en": "Inferior deep lateral cervical nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Inferior diaphragmatic nodes",
+      "system": "lymphoid",
+      "name_en": "Inferior diaphragmatic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Inferior epigastric nodes.l",
+      "system": "lymphoid",
+      "name_en": "Inferior epigastric nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior epigastric nodes.r",
+      "system": "lymphoid",
+      "name_en": "Inferior epigastric nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Inferior gluteal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Inferior gluteal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior gluteal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Inferior gluteal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Inferior pancreatic nodes",
+      "system": "lymphoid",
+      "name_en": "Inferior pancreatic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Inferior superficial inguinal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Inferior superficial inguinal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Inferior superficial inguinal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Inferior superficial inguinal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Inferior tracheobronchial nodes",
+      "system": "lymphoid",
+      "name_en": "Inferior tracheobronchial nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Infra-auricular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Infra-auricular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Infra-auricular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Infra-auricular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Infraclavicular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Infraclavicular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Infraclavicular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Infraclavicular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Intercostal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Intercostal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Intercostal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Intercostal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Intermediate common iliac nodes",
+      "system": "lymphoid",
+      "name_en": "Intermediate common iliac nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Intermediate external iliac nodes.l",
+      "system": "lymphoid",
+      "name_en": "Intermediate external iliac nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Intermediate external iliac nodes.r",
+      "system": "lymphoid",
+      "name_en": "Intermediate external iliac nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Intermediate lumbar nodes",
+      "system": "lymphoid",
+      "name_en": "Intermediate lumbar nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Interpectoral nodes.l",
+      "system": "lymphoid",
+      "name_en": "Interpectoral nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Interpectoral nodes.r",
+      "system": "lymphoid",
+      "name_en": "Interpectoral nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Intraglandular parotid nodes.l",
+      "system": "lymphoid",
+      "name_en": "Intraglandular parotid nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Intraglandular parotid nodes.r",
+      "system": "lymphoid",
+      "name_en": "Intraglandular parotid nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Intrapulmonary nodes",
+      "system": "lymphoid",
+      "name_en": "Intrapulmonary nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Jugulodigastric node.l",
+      "system": "lymphoid",
+      "name_en": "Jugulodigastric node",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Jugulodigastric node.r",
+      "system": "lymphoid",
+      "name_en": "Jugulodigastric node",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Juxta-intestinal mesenteric nodes",
+      "system": "lymphoid",
+      "name_en": "Juxta-intestinal mesenteric nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Juxta-oesophageal nodes",
+      "system": "lymphoid",
+      "name_en": "Juxta-oesophageal nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral aortic nodes",
+      "system": "lymphoid",
+      "name_en": "Lateral aortic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral axillary nodes.l",
+      "system": "lymphoid",
+      "name_en": "Lateral axillary nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Lateral axillary nodes.r",
+      "system": "lymphoid",
+      "name_en": "Lateral axillary nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Lateral caval nodes",
+      "system": "lymphoid",
+      "name_en": "Lateral caval nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral common iliac nodes",
+      "system": "lymphoid",
+      "name_en": "Lateral common iliac nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral pericardial nodes",
+      "system": "lymphoid",
+      "name_en": "Lateral pericardial nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Lateral sacral nodes.l",
+      "system": "lymphoid",
+      "name_en": "Lateral sacral nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Lateral sacral nodes.r",
+      "system": "lymphoid",
+      "name_en": "Lateral sacral nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Lateral superior jugular node.l",
+      "system": "lymphoid",
+      "name_en": "Lateral superior jugular node",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Lateral superior jugular node.r",
+      "system": "lymphoid",
+      "name_en": "Lateral superior jugular node",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Lateral vesical nodes.l",
+      "system": "lymphoid",
+      "name_en": "Lateral vesical nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Lateral vesical nodes.r",
+      "system": "lymphoid",
+      "name_en": "Lateral vesical nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Left colic nodes",
+      "system": "lymphoid",
+      "name_en": "Left colic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Mandibular node.l",
+      "system": "lymphoid",
+      "name_en": "Mandibular node",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Mandibular node.r",
+      "system": "lymphoid",
+      "name_en": "Mandibular node",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Mastoid nodes.l",
+      "system": "lymphoid",
+      "name_en": "Mastoid nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Mastoid nodes.r",
+      "system": "lymphoid",
+      "name_en": "Mastoid nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Medial common iliac nodes",
+      "system": "lymphoid",
+      "name_en": "Medial common iliac nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Medial external iliac nodes.l",
+      "system": "lymphoid",
+      "name_en": "Medial external iliac nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Medial external iliac nodes.r",
+      "system": "lymphoid",
+      "name_en": "Medial external iliac nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Median sacral nodes",
+      "system": "lymphoid",
+      "name_en": "Median sacral nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Middle colic nodes",
+      "system": "lymphoid",
+      "name_en": "Middle colic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Nasolabial node.l",
+      "system": "lymphoid",
+      "name_en": "Nasolabial node",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Nasolabial node.r",
+      "system": "lymphoid",
+      "name_en": "Nasolabial node",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Node of arch of azygos vein",
+      "system": "lymphoid",
+      "name_en": "Node of arch of azygos vein",
+      "name_lat": ""
+    },
+    {
+      "id": "Node of ligamentum arteriosum",
+      "system": "lymphoid",
+      "name_en": "Node of ligamentum arteriosum",
+      "name_lat": ""
+    },
+    {
+      "id": "Obturator nodes.l",
+      "system": "lymphoid",
+      "name_en": "Obturator nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Obturator nodes.r",
+      "system": "lymphoid",
+      "name_en": "Obturator nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Occipital nodes.l",
+      "system": "lymphoid",
+      "name_en": "Occipital nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Occipital nodes.r",
+      "system": "lymphoid",
+      "name_en": "Occipital nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Palatine tonsil.l",
+      "system": "lymphoid",
+      "name_en": "Palatine tonsil",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Palatine tonsil.r",
+      "system": "lymphoid",
+      "name_en": "Palatine tonsil",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Paracolic superior mesenteric nodes",
+      "system": "lymphoid",
+      "name_en": "Paracolic superior mesenteric nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Pararectal nodes",
+      "system": "lymphoid",
+      "name_en": "Pararectal nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Parasternal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Parasternal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Parasternal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Parasternal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Paratracheal cervical nodes",
+      "system": "lymphoid",
+      "name_en": "Paratracheal cervical nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Paratracheal thoracic nodes",
+      "system": "lymphoid",
+      "name_en": "Paratracheal thoracic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Posterior axillary nodes.l",
+      "system": "lymphoid",
+      "name_en": "Posterior axillary nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior axillary nodes.r",
+      "system": "lymphoid",
+      "name_en": "Posterior axillary nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Postvesical nodes",
+      "system": "lymphoid",
+      "name_en": "Postvesical nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Pre-aortic nodes",
+      "system": "lymphoid",
+      "name_en": "Pre-aortic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Pre-auricular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Pre-auricular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Pre-auricular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Pre-auricular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Precaecal nodes",
+      "system": "lymphoid",
+      "name_en": "Precaecal nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Precaval nodes",
+      "system": "lymphoid",
+      "name_en": "Precaval nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Prepericardial nodes",
+      "system": "lymphoid",
+      "name_en": "Prepericardial nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Pretracheal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Pretracheal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Pretracheal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Pretracheal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Prevertebral nodes",
+      "system": "lymphoid",
+      "name_en": "Prevertebral nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Prevesical nodes",
+      "system": "lymphoid",
+      "name_en": "Prevesical nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Retro-aortic nodes",
+      "system": "lymphoid",
+      "name_en": "Retro-aortic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Retrocaecal nodes",
+      "system": "lymphoid",
+      "name_en": "Retrocaecal nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Retrocaval nodes",
+      "system": "lymphoid",
+      "name_en": "Retrocaval nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Retropharyngeal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Retropharyngeal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Retropharyngeal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Retropharyngeal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Right colic nodes",
+      "system": "lymphoid",
+      "name_en": "Right colic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Right gastric nodes",
+      "system": "lymphoid",
+      "name_en": "Right gastric nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Right gastro-omental nodes",
+      "system": "lymphoid",
+      "name_en": "Right gastro-omental nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Sigmoid nodes",
+      "system": "lymphoid",
+      "name_en": "Sigmoid nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Splenic nodes",
+      "system": "lymphoid",
+      "name_en": "Splenic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Subaortic nodes",
+      "system": "lymphoid",
+      "name_en": "Subaortic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Submandibular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Submandibular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Submandibular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Submandibular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Submental nodes.l",
+      "system": "lymphoid",
+      "name_en": "Submental nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Submental nodes.r",
+      "system": "lymphoid",
+      "name_en": "Submental nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superficial anterior cervical nodes",
+      "system": "lymphoid",
+      "name_en": "Superficial anterior cervical nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Superficial lateral cervical nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superficial lateral cervical nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superficial lateral cervical nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superficial lateral cervical nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superficial parotid nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superficial parotid nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superficial parotid nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superficial parotid nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superficial popliteal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superficial popliteal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superficial popliteal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superficial popliteal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superior diaphragmatic nodes",
+      "system": "lymphoid",
+      "name_en": "Superior diaphragmatic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Superior gluteal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superior gluteal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superior gluteal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superior gluteal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superior pancreatic nodes",
+      "system": "lymphoid",
+      "name_en": "Superior pancreatic nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Superior pancreaticoduodenal nodes",
+      "system": "lymphoid",
+      "name_en": "Superior pancreaticoduodenal nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Superior tracheobronchial nodes",
+      "system": "lymphoid",
+      "name_en": "Superior tracheobronchial nodes",
+      "name_lat": ""
+    },
+    {
+      "id": "Superolateral superficial inguinal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superolateral superficial inguinal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superolateral superficial inguinal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superolateral superficial inguinal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Superomedial superficial inguinal nodes.l",
+      "system": "lymphoid",
+      "name_en": "Superomedial superficial inguinal nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Superomedial superficial inguinal nodes.r",
+      "system": "lymphoid",
+      "name_en": "Superomedial superficial inguinal nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Supraclavicular nodes.l",
+      "system": "lymphoid",
+      "name_en": "Supraclavicular nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Supraclavicular nodes.r",
+      "system": "lymphoid",
+      "name_en": "Supraclavicular nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Supratrochlear nodes.l",
+      "system": "lymphoid",
+      "name_en": "Supratrochlear nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Supratrochlear nodes.r",
+      "system": "lymphoid",
+      "name_en": "Supratrochlear nodes",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Thyroid nodes.l",
+      "system": "lymphoid",
+      "name_en": "Thyroid nodes",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Thyroid nodes.r",
+      "system": "lymphoid",
+      "name_en": "Thyroid nodes",
+      "name_lat": "",
       "side": "r"
     }
   ]

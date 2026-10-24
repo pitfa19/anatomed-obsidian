@@ -9,7 +9,8 @@ export type SystemId =
   | 'organs'
   | 'joints'
   | 'insertions'
-  | 'regions';
+  | 'regions'
+  | 'lymphoid';
 
 export interface SystemMeta {
   id: SystemId;
