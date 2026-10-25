@@ -48,7 +48,7 @@ jobs:
             main.js
             styles.css
             manifest.json
-            release-assets/anatomed-assets-v2.zip
+            release-assets/anatomed-assets-v3.zip
 
       - name: Create GitHub Release
         env:
@@ -64,4 +64,4 @@ jobs:
           gh release create "$tag" \
             --title "$tag" \
             --notes "Local-first Anatomed release. The plugin downloads and verifies the anatomy asset pack once, then loads it from the user's vault. Assets carry GitHub build-provenance attestations." \
-            main.js manifest.json styles.css release-assets/anatomed-assets-v2.zip
+            main.js manifest.json styles.css release-assets/anatomed-assets-v3.zip

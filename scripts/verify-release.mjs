@@ -1,14 +1,14 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { unzipSync } from 'fflate';
-import { PACK_NAME, RELEASE, SYSTEMS, sha256 } from './package-assets.mjs';
+import { PACK_NAME, RELEASE, SYSTEMS, VERSION, sha256 } from './package-assets.mjs';
 
 const metadata = JSON.parse(readFileSync('src/assetPack.generated.json', 'utf8'));
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'));
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
 const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
 const versions = JSON.parse(readFileSync('versions.json', 'utf8'));
-if ([manifest.version, pkg.version, lock.version, lock.packages[''].version, metadata.version].some((v) => v !== '0.1.8') || versions['0.1.8'] !== manifest.minAppVersion) {
-  throw new Error('release versions are not aligned at 0.1.8');
+if ([manifest.version, pkg.version, lock.version, lock.packages[''].version, metadata.version].some((v) => v !== VERSION) || versions[VERSION] !== manifest.minAppVersion) {
+  throw new Error(`release versions are not aligned at ${VERSION}`);
 }
 if (metadata.release !== RELEASE || metadata.pack !== PACK_NAME) throw new Error('wrong release identity');
 const expectedPaths = [...SYSTEMS.map((id) => `glb/${id}.glb`), 'parts-neighbors.json'].sort();

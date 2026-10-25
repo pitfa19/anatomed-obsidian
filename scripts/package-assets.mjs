@@ -4,8 +4,9 @@ import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { zipSync } from 'fflate';
 
-export const RELEASE = 'releases/2026-10-24-v2';
-export const PACK_NAME = 'anatomed-assets-v2.zip';
+export const RELEASE = 'releases/2026-10-24-v3';
+export const PACK_NAME = 'anatomed-assets-v3.zip';
+export const VERSION = '0.1.9';
 export const SYSTEMS = ['insertions', 'joints', 'lymphoid', 'muscles', 'nerves', 'organs', 'regions', 'skeleton', 'vessels'];
 export const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
@@ -27,7 +28,7 @@ export function buildPack(assetDir) {
   });
   const zip = zipSync(archive, { level: 9 });
   return { zip, metadata: {
-    release: RELEASE, version: '0.1.8', pack: PACK_NAME,
+    release: RELEASE, version: VERSION, pack: PACK_NAME,
     bytes: zip.length, sha256: sha256(zip), assets,
     publicObjects: [...assets, { path: 'parts-catalog.json', bytes: catalogBytes.length, sha256: sha256(catalogBytes) }],
   } };

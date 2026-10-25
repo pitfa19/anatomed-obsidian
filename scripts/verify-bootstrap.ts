@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { ASSETS, decodeAssetPack } from '../src/assetPack';
 
-const pack = new Uint8Array(readFileSync('release-assets/anatomed-assets-v2.zip'));
+const pack = new Uint8Array(readFileSync('release-assets/anatomed-assets-v3.zip'));
 const archive = decodeAssetPack(pack);
 for (const [relative, expectedSize] of ASSETS) {
   if (archive[relative].byteLength !== expectedSize) throw new Error(`bad decoded size: ${relative}`);

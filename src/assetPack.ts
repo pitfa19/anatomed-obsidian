@@ -2,20 +2,24 @@ import { createHash } from 'node:crypto';
 import { unzipSync } from 'fflate';
 import metadata from './assetPack.generated.json';
 
-export const ASSET_RELEASE = 'releases/2026-10-24-v2';
+export const ASSET_RELEASE = 'releases/2026-10-24-v3';
+/** Built-in default shipped by 0.1.8; saved in users' data.json and upgraded on load. */
+export const PREVIOUS_DEFAULT_ASSET_BASE =
+  'https://uafyfwyyqzunabpuftue.supabase.co/storage/v1/object/public/models/releases/2026-10-24-v2';
 export const LEGACY_ASSET_BASE = 'https://uafyfwyyqzunabpuftue.supabase.co/storage/v1/object/public/models';
 export const DEFAULT_ASSET_BASE = `${LEGACY_ASSET_BASE}/${ASSET_RELEASE}`;
 export const ASSET_PACK_URL =
-  'https://github.com/pitfa19/anatomed-obsidian/releases/download/0.1.8/anatomed-assets-v2.zip';
+  'https://github.com/pitfa19/anatomed-obsidian/releases/download/0.1.9/anatomed-assets-v3.zip';
 export const ASSET_PACK_SHA256 = metadata.sha256;
 export const ASSETS: ReadonlyArray<readonly [string, number, string]> = metadata.assets.map(
   (asset) => [asset.path, asset.bytes, asset.sha256] as const,
 );
 export type AssetPath = string;
 
-/** Upgrade only the old built-in default. Deliberate custom/rollback URLs survive. */
+/** Upgrade only old built-in defaults (legacy root, 0.1.8 v2). Deliberate custom/rollback URLs survive. */
 export function migrateAssetBase(base: string): string {
-  return base.replace(/\/+$/, '') === LEGACY_ASSET_BASE ? DEFAULT_ASSET_BASE : base;
+  const trimmed = base.replace(/\/+$/, '');
+  return trimmed === LEGACY_ASSET_BASE || trimmed === PREVIOUS_DEFAULT_ASSET_BASE ? DEFAULT_ASSET_BASE : base;
 }
 
 export function assetDigest(input: ArrayBuffer | Uint8Array): string {
