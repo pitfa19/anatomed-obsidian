@@ -1,19 +1,19 @@
 {
-  "release": "releases/2026-10-24-v2",
-  "version": "0.1.8",
-  "pack": "anatomed-assets-v2.zip",
-  "bytes": 14399422,
-  "sha256": "ef6a62800dafea9ba10dabb9ac5225bb21b25a5c659c3020cbe0da30f4832d17",
+  "release": "releases/2026-10-24-v3",
+  "version": "0.1.9",
+  "pack": "anatomed-assets-v3.zip",
+  "bytes": 16912243,
+  "sha256": "dde9b6f6cbc48e6aed3434cd596619a8b58b2738418ce471d7a77e0fc522e6d1",
   "assets": [
     {
       "path": "glb/insertions.glb",
-      "bytes": 1383896,
-      "sha256": "a3a33a40eb7d4b34a8957866ba2367ba347392cc5ef70d0456d1b1bd83cb9903"
+      "bytes": 1719756,
+      "sha256": "7c0a9944f7ef91dec29056ea75858e8b33895d7a4e10b0641866ca4743edeed0"
     },
     {
       "path": "glb/joints.glb",
       "bytes": 1140768,
-      "sha256": "80938abd84537ef8dfbba4fca099d28a342471a1432226e618eccafe5f15e5f4"
+      "sha256": "f98c0707394e24484ca898587b078c95ebf98a0a38eb57c9d611e0baeaddd23f"
     },
     {
       "path": "glb/lymphoid.glb",
@@ -32,18 +32,18 @@
     },
     {
       "path": "glb/organs.glb",
-      "bytes": 1776264,
-      "sha256": "a93b7cfb8beaf5e4ea0fb6b79183c638fc584553b822869c260a81cc89e4d061"
+      "bytes": 4016276,
+      "sha256": "568eddf984593ccf9894c5b2a1479bd481b334506798185a20ffb336c1a79325"
     },
     {
       "path": "glb/regions.glb",
-      "bytes": 752024,
-      "sha256": "5c05d2ad171687a36d7ad776c9e0fb11170e7ff64646b10a284d499455ee2404"
+      "bytes": 1117408,
+      "sha256": "4940ef8bf4c2b50bf198ec213afc36ab21dbe2ef4246c76fbf8d380058a74c92"
     },
     {
       "path": "glb/skeleton.glb",
-      "bytes": 1873564,
-      "sha256": "afb0562864c32503ec4776849df6dbd4a5a77753a1afdd52750c02a596557fa9"
+      "bytes": 2054004,
+      "sha256": "ce16af0ff7ec3badf2b36743a47e8e583f114940285da9389c7f42ceb654068c"
     },
     {
       "path": "glb/vessels.glb",
@@ -52,20 +52,20 @@
     },
     {
       "path": "parts-neighbors.json",
-      "bytes": 5966103,
-      "sha256": "71c3e786c9243dae10a6840aaf492086492977403d10aa059755112454e069af"
+      "bytes": 5980362,
+      "sha256": "1d6883935500ef47535623ef9c9d5d4263c069a7e81643218be1a989e4dad77b"
     }
   ],
   "publicObjects": [
     {
       "path": "glb/insertions.glb",
-      "bytes": 1383896,
-      "sha256": "a3a33a40eb7d4b34a8957866ba2367ba347392cc5ef70d0456d1b1bd83cb9903"
+      "bytes": 1719756,
+      "sha256": "7c0a9944f7ef91dec29056ea75858e8b33895d7a4e10b0641866ca4743edeed0"
     },
     {
       "path": "glb/joints.glb",
       "bytes": 1140768,
-      "sha256": "80938abd84537ef8dfbba4fca099d28a342471a1432226e618eccafe5f15e5f4"
+      "sha256": "f98c0707394e24484ca898587b078c95ebf98a0a38eb57c9d611e0baeaddd23f"
     },
     {
       "path": "glb/lymphoid.glb",
@@ -84,18 +84,18 @@
     },
     {
       "path": "glb/organs.glb",
-      "bytes": 1776264,
-      "sha256": "a93b7cfb8beaf5e4ea0fb6b79183c638fc584553b822869c260a81cc89e4d061"
+      "bytes": 4016276,
+      "sha256": "568eddf984593ccf9894c5b2a1479bd481b334506798185a20ffb336c1a79325"
     },
     {
       "path": "glb/regions.glb",
-      "bytes": 752024,
-      "sha256": "5c05d2ad171687a36d7ad776c9e0fb11170e7ff64646b10a284d499455ee2404"
+      "bytes": 1117408,
+      "sha256": "4940ef8bf4c2b50bf198ec213afc36ab21dbe2ef4246c76fbf8d380058a74c92"
     },
     {
       "path": "glb/skeleton.glb",
-      "bytes": 1873564,
-      "sha256": "afb0562864c32503ec4776849df6dbd4a5a77753a1afdd52750c02a596557fa9"
+      "bytes": 2054004,
+      "sha256": "ce16af0ff7ec3badf2b36743a47e8e583f114940285da9389c7f42ceb654068c"
     },
     {
       "path": "glb/vessels.glb",
@@ -104,13 +104,13 @@
     },
     {
       "path": "parts-neighbors.json",
-      "bytes": 5966103,
-      "sha256": "71c3e786c9243dae10a6840aaf492086492977403d10aa059755112454e069af"
+      "bytes": 5980362,
+      "sha256": "1d6883935500ef47535623ef9c9d5d4263c069a7e81643218be1a989e4dad77b"
     },
     {
       "path": "parts-catalog.json",
-      "bytes": 736586,
-      "sha256": "182a9a45e427b07d2fda97d92fb45f027e13a16678cc39874bd132977bcf4769"
+      "bytes": 739796,
+      "sha256": "a8d26316b82d1ccf69da371576ee033dd895587c69160e95c1cdc8a5d5a683b5"
     }
   ]
 }
