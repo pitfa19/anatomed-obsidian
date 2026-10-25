@@ -105,3 +105,27 @@ The four restored visceral surfaces have no named counterparts. The legacy Phary
 - Seven focused tests cover named containers, world transforms, zero-area/nonfinite geometry, helper/empty targets, laterality, neighbor ordering/exclusions and additive-merge preservation/duplicate rejection. Full acceptance checks the real nine-system dataset.
 
 Data checks do not establish clinical equivalence, visual quality or native-app behavior. Those remain separate renderer/coordinator acceptance concerns. The original source contains compatibility warnings in modern Blender; no source file is altered to silence them.
+
+## 0.1.9 layer (asset release `releases/2026-10-24-v3`)
+
+A follow-up port check compared every remaining unresolved source object by nearest-surface coverage against all nine decoded 0.1.8 GLBs (calibrated on 320 exact-named controls, 312 matched). It found 914 already present under other names, 48 teaching overlays (movement arrows, orientation terms, planes, surface reference lines) and **19 genuinely missing structures**. It also found two `.l` insertion targets that were copies of the right-side patch, and two left/right label pairs inverted in Z-Anatomy itself.
+
+`v3-decisions.json` records each reviewed change with rationale. The 0.1.8 pipeline above is unchanged and still reproducible; the v3 layer is applied on top of its committed outputs:
+
+```bash
+blender --background --disable-autoexec --python scripts/anatomy-data/export-v3-additions.py -- \
+  /absolute/source/Startup.blend /absolute/source-audit/inventory.json \
+  /absolute/repo/scripts/anatomy-data/v3-decisions.json /absolute/v3-additions
+# BASE dir holds the exact 0.1.8 GLBs (hashes checked against provenance).
+node scripts/anatomy-data/apply-v3-edits.mjs /absolute/base-0.1.8-glb \
+  /absolute/repo/scripts/anatomy-data/v3-decisions.json /absolute/v3-additions /absolute/v3-glb
+node scripts/anatomy-data/generate-v3.mjs /absolute/repo/assets /absolute/v3-glb /absolute/v3-assets \
+  /absolute/repo/scripts/anatomy-data/v3-decisions.json
+node --test scripts/anatomy-data/apply-v3-edits.test.mjs
+node scripts/anatomy-data/validate-v3.mjs /absolute/v3-assets /absolute/v3-glb
+```
+
+- **19 source additions**: 8 left-side muscle attachment patches (two of them replace the wrong-side copies), the trochanteric insertion on both sides, 6 ethmoid air cells, Hairs of head, Mucosa of stomach and Pleura (the 0.1.8 "unresolved" Pleura decision is reversed: it is a membrane on the lung surface, not a lobe).
+- **Edits are recorded and reversible**: superseded wrong-side copies are renamed and detached from the scene (kept in the file, never rendered). The two laterality swaps rename nodes only. `verifyV3` undoes these edits in memory and proves the 0.1.8 binary chunk and node/mesh/accessor/bufferView prefixes are unchanged; nothing existing is rewritten.
+- **Acceptance**: 3,911 selectable rows; every side-labelled part sits on its labelled side (global audit, 0 wrong-side); all 19 additions within 0.01 mm of their source bounds (max 1.2e-7 m); the independent port check rerun reports 0 remaining missing anatomy and all 19 sources covered by their own new part.
+

@@ -16,8 +16,14 @@ const { applyTint, findPartByName } = await load('widget/lib/three-helpers.ts');
 globalThis.self = globalThis;
 const catalog = JSON.parse(await fs.readFile(path.join(repo, 'assets/parts-catalog.json'), 'utf8'));
 const decisions = JSON.parse(await fs.readFile(path.join(repo, 'assets/source-restoration-decisions.json'), 'utf8'));
-const restored = decisions.rows.filter(r => r.decision.startsWith('restore-'));
-assert.equal(restored.length, 123);
+const v3 = JSON.parse(await fs.readFile(path.join(repo, 'assets/v3-decisions.json'), 'utf8'));
+// 0.1.8 reviewed restorations plus the 19 reviewed 0.1.9 sources (same shape: system + current_id).
+const restored = [...decisions.rows.filter(r => r.decision.startsWith('restore-')), ...v3.additions];
+const EXPECTED_RESTORED = 123 + 19;
+// Viewer-thinned insertion markers: 122 in 0.1.8, minus the 2 retired wrong-side copies (detached, not rendered),
+// plus 3 new left patches whose right twins were already thinned. Measured on real v3 data.
+const EXPECTED_INSERTION_MARKERS = 122 - 2 + 3;
+assert.equal(restored.length, EXPECTED_RESTORED);
 const result = { repo, generatedAt: new Date().toISOString(), restored: [], systems: [], unexpectedChanges: [] };
 const bounds = object => {
   object.updateWorldMatrix(true, true);
@@ -53,12 +59,15 @@ for (const system of catalog.systems) {
   }
   result.systems.push({ system: system.id, sha256: crypto.createHash('sha256').update(bytes).digest('hex'), meshes: meshes.length, changed });
   if (system.id !== 'insertions') result.unexpectedChanges.push(...changed.map(row => ({ system: system.id, ...row })));
+  // Insertion markers are intentionally thinned by the viewer, so only non-insertion restorations must keep exact bounds.
+  for (const r of result.restored) if (r.system === 'insertions') r.intentionalMarker = true;
 }
 await fs.writeFile(output, JSON.stringify(result, null, 2));
 console.log(JSON.stringify({ repo, restored: result.restored.length, restoredChanged: result.restored.filter(r => !r.unchanged).length, changedBySystem: result.systems.map(r => [r.system, r.changed.length]), unexpected: result.unexpectedChanges.length }));
 if (mode !== 'observe') {
-  assert.equal(result.restored.length, 123);
-  assert.equal(result.restored.filter(r => !r.unchanged).length, 0, 'restored real anatomy must not be distorted');
+  assert.equal(result.restored.length, EXPECTED_RESTORED);
+  assert.equal(result.restored.filter(r => !r.unchanged && !r.intentionalMarker).length, 0, 'restored real anatomy must not be distorted');
   assert.equal(result.unexpectedChanges.length, 0, 'only intentional insertion markers may be rescaled');
-  assert.equal(result.systems.find(r => r.system === 'insertions').changed.length, 122, 'intentional insertion-marker behavior is preserved');
+  // See EXPECTED_INSERTION_MARKERS derivation above.
+  assert.equal(result.systems.find(r => r.system === 'insertions').changed.length, EXPECTED_INSERTION_MARKERS, 'intentional insertion-marker behavior is preserved');
 }

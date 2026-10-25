@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "release": "releases/2026-10-24-v3",
+  "source_sha256": "9f08a17ea0115fed80b2a73ecdf0a1bc2ab2f6956f37c593ce23d513ea35afcd",
+  "method": "Follow-up port check (24 Oct 2026): every unresolved source object compared by nearest-surface coverage against all nine decoded 0.1.8 GLBs, calibrated on 320 exact-named controls (312 same-structure). Each row below was then reviewed individually by name, collection, side and position.",
+  "additions": [
+    {"source_id": "Abductor digiti minimi of hand.el", "system": "insertions", "current_id": "Abductor digiti minimi on base of prox. phal. of 5th finger.l", "rationale": "Left twin of the right-side patch already shipped as 'Abductor digiti minimi on base of prox. phal. of 5th finger.r' (same source shape mirrored). Left patch absent: best own-system coverage 13% within 1 mm, nearest is a different muscle's attachment."},
+    {"source_id": "Abductor hallucis.ol", "system": "insertions", "current_id": "Abductor hallucis on medial process of calcaneal tuberosity.l", "rationale": "Left twin of shipped '...calcaneal tuberosity.r'. Left patch absent: 21% within 1 mm, nearest is flexor digitorum brevis attachment."},
+    {"source_id": "Deep head of flexor pollicis brevis.o1l", "system": "insertions", "current_id": "Deep head of flexor pollicis brevis on 1st metacarpal bone.l", "rationale": "Left twin of shipped '...on 1st metacarpal bone..r' (source double period not carried over). Left patch absent: 3% within 1 mm."},
+    {"source_id": "Extensor hallucis longus.ol", "system": "insertions", "current_id": "Extensor hallucis longus on fibula and interosseus membrane.l", "replaces_wrong_side_node": true, "rationale": "Shipped '.l' node is a copy of the right-side patch (centre x -101 mm, same 1408 triangles as '.r'), so the left leg had no patch. Replace it with the real left source surface (centre x +100 mm)."},
+    {"source_id": "Tibialis posterior muscle.ol", "system": "insertions", "current_id": "Tibialis posterior on post. surface of interosseus membrane.l", "replaces_wrong_side_node": true, "rationale": "Shipped '.l' node is a copy of the right-side patch (centre x -105 mm, same 2542 triangles as '.r'). Replace with the real left source surface (centre x +94 mm)."},
+    {"source_id": "Transverse head of adductor hallucis.e1l", "system": "insertions", "current_id": "Transverse head of adductor hallucis on 5th metatarsal head.l", "rationale": "Left twin of shipped '...5th metatarsal head.r'. No left patch in insertions (0% within 1 mm)."},
+    {"source_id": "Transverse head of adductor hallucis.e2l", "system": "insertions", "current_id": "Transverse head of adductor hallucis on 4th metatarsal head.l", "rationale": "Left twin of shipped '...4th metatarsal head.r'. No left patch in insertions."},
+    {"source_id": "Transverse head of adductor hallucis.e3l", "system": "insertions", "current_id": "Transverse head of adductor hallucis on 3rd metatarsal head.l", "rationale": "Left twin of shipped '...3rd metatarsal head.r'. No left patch in insertions."},
+    {"source_id": "Trochanteric insertion.el", "system": "insertions", "current_id": "Trochanteric insertion.l", "rationale": "Common trochanteric insertion of obturator internus and gemelli. Neither side exists in insertions (0% within 1 mm); only the muscles themselves overlap it."},
+    {"source_id": "Trochanteric insertion.er", "system": "insertions", "current_id": "Trochanteric insertion.r", "rationale": "Right side of the same absent insertion patch."},
+    {"source_id": "Anterior cells of ethmoid bone.l", "system": "skeleton", "current_id": "Anterior cells of ethmoid bone.l", "rationale": "Ethmoid air cells are distinct named sinus cavities. Only 19% of the surface lies within 1 mm of the whole Ethmoid bone mesh (4x larger)."},
+    {"source_id": "Anterior cells of ethmoid bone.r", "system": "skeleton", "current_id": "Anterior cells of ethmoid bone.r", "rationale": "As left side."},
+    {"source_id": "Middle cells of ethmoid bone.l", "system": "skeleton", "current_id": "Middle cells of ethmoid bone.l", "rationale": "15% within 1 mm of Ethmoid bone; distinct named cavity."},
+    {"source_id": "Middle cells of ethmoid bone.r", "system": "skeleton", "current_id": "Middle cells of ethmoid bone.r", "rationale": "As left side."},
+    {"source_id": "Posterior cells of ethmoid bone.l", "system": "skeleton", "current_id": "Posterior cells of ethmoid bone.l", "rationale": "34% within 1 mm of Ethmoid bone; distinct named cavity."},
+    {"source_id": "Posterior cells of ethmoid bone.r", "system": "skeleton", "current_id": "Posterior cells of ethmoid bone.r", "rationale": "As left side."},
+    {"source_id": "Hairs of head", "system": "regions", "current_id": "Hairs of head", "rationale": "Scalp hair surface. Only 42% within 1 mm of the shipped 'Hair' region; added as its own object, 'Hair' unchanged."},
+    {"source_id": "Mucosa of stomach", "system": "organs", "current_id": "Mucosa of stomach", "rationale": "Inner gastric lining, distinct from the Stomach wall surface (60% within 1 mm, size ratio 1.2, would be hidden inside Stomach). Added as its own selectable object."},
+    {"source_id": "Pleura", "system": "organs", "current_id": "Pleura", "rationale": "Reverses the 0.1.8 'unresolved' decision. Pleura is a separate membrane wrapping the lungs, not a lung lobe; 98.7% within 2 mm is expected for a membrane on the lung surface. Added as its own object; lung lobes unchanged."}
+  ],
+  "renames": [
+    {"system": "joints", "swap": ["Lateral temporomandibular ligament.l", "Lateral temporomandibular ligament.r"], "rationale": "Source labels are inverted: '.l' sits at x -53.8 mm (body right). Glb node names swapped so '.l' is the body-left ligament. Geometry and transforms untouched."},
+    {"system": "regions", "swap": ["Eyelashes.l", "Eyelashes.r"], "rationale": "Source labels are inverted: '.l' sits at x -35.7 mm (body right). Node names swapped. Geometry untouched."}
+  ]
+}

@@ -4,7 +4,7 @@
       "id": "skeleton",
       "label_en": "Skeleton",
       "label_hr": "Kostur",
-      "glb": "/models/glb/skeleton.glb?v=afb05628",
+      "glb": "/models/glb/skeleton.glb?v=ce16af0f",
       "tint": "#e8d8b9"
     },
     {
@@ -32,28 +32,28 @@
       "id": "organs",
       "label_en": "Organs",
       "label_hr": "Organi",
-      "glb": "/models/glb/organs.glb?v=a93b7cfb",
+      "glb": "/models/glb/organs.glb?v=568eddf9",
       "tint": "#d99a9a"
     },
     {
       "id": "joints",
       "label_en": "Joints",
       "label_hr": "Zglobovi",
-      "glb": "/models/glb/joints.glb?v=80938abd",
+      "glb": "/models/glb/joints.glb?v=f98c0707",
       "tint": "#c9b48a"
     },
     {
       "id": "insertions",
       "label_en": "Insertions",
       "label_hr": "Hvatišta",
-      "glb": "/models/glb/insertions.glb?v=a3a33a40",
+      "glb": "/models/glb/insertions.glb?v=7c0a9944",
       "tint": "#7d5a3a"
     },
     {
       "id": "regions",
       "label_en": "Regions",
       "label_hr": "Regije",
-      "glb": "/models/glb/regions.glb?v=5c05d2ad",
+      "glb": "/models/glb/regions.glb?v=4940ef8b",
       "tint": "#9aa6b3"
     },
     {
@@ -1919,6 +1919,48 @@
       "system": "skeleton",
       "name_en": "Zygomatic bone",
       "name_lat": "Os zygomaticum",
+      "side": "r"
+    },
+    {
+      "id": "Anterior cells of ethmoid bone.l",
+      "system": "skeleton",
+      "name_en": "Anterior cells of ethmoid bone",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Anterior cells of ethmoid bone.r",
+      "system": "skeleton",
+      "name_en": "Anterior cells of ethmoid bone",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Middle cells of ethmoid bone.l",
+      "system": "skeleton",
+      "name_en": "Middle cells of ethmoid bone",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Middle cells of ethmoid bone.r",
+      "system": "skeleton",
+      "name_en": "Middle cells of ethmoid bone",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
+      "id": "Posterior cells of ethmoid bone.l",
+      "system": "skeleton",
+      "name_en": "Posterior cells of ethmoid bone",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Posterior cells of ethmoid bone.r",
+      "system": "skeleton",
+      "name_en": "Posterior cells of ethmoid bone",
+      "name_lat": "",
       "side": "r"
     },
     {
@@ -16055,6 +16097,18 @@
       "name_lat": ""
     },
     {
+      "id": "Mucosa of stomach",
+      "system": "organs",
+      "name_en": "Mucosa of stomach",
+      "name_lat": ""
+    },
+    {
+      "id": "Pleura",
+      "system": "organs",
+      "name_en": "Pleura",
+      "name_lat": ""
+    },
+    {
       "id": "Acetabular labrum.l",
       "system": "joints",
       "name_en": "Acetabular labrum",
@@ -23997,6 +24051,62 @@
       "side": "r"
     },
     {
+      "id": "Abductor digiti minimi on base of prox. phal. of 5th finger.l",
+      "system": "insertions",
+      "name_en": "Abductor digiti minimi on base of prox. phal. of 5th finger",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Abductor hallucis on medial process of calcaneal tuberosity.l",
+      "system": "insertions",
+      "name_en": "Abductor hallucis on medial process of calcaneal tuberosity",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Deep head of flexor pollicis brevis on 1st metacarpal bone.l",
+      "system": "insertions",
+      "name_en": "Deep head of flexor pollicis brevis on 1st metacarpal bone",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Transverse head of adductor hallucis on 3rd metatarsal head.l",
+      "system": "insertions",
+      "name_en": "Transverse head of adductor hallucis on 3rd metatarsal head",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Transverse head of adductor hallucis on 4th metatarsal head.l",
+      "system": "insertions",
+      "name_en": "Transverse head of adductor hallucis on 4th metatarsal head",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Transverse head of adductor hallucis on 5th metatarsal head.l",
+      "system": "insertions",
+      "name_en": "Transverse head of adductor hallucis on 5th metatarsal head",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Trochanteric insertion.l",
+      "system": "insertions",
+      "name_en": "Trochanteric insertion",
+      "name_lat": "",
+      "side": "l"
+    },
+    {
+      "id": "Trochanteric insertion.r",
+      "system": "insertions",
+      "name_en": "Trochanteric insertion",
+      "name_lat": "",
+      "side": "r"
+    },
+    {
       "id": "Anal region.l",
       "system": "regions",
       "name_en": "Anal region",
@@ -25785,6 +25895,12 @@
       "name_en": "Zygomatic region",
       "name_lat": "Regio zygomatica",
       "side": "r"
+    },
+    {
+      "id": "Hairs of head",
+      "system": "regions",
+      "name_en": "Hairs of head",
+      "name_lat": ""
     },
     {
       "id": "(Anterior tibial node).l",
